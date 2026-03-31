@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@stockwiki/domain": "workspace:*",
     "@stockwiki/fixtures": "workspace:*",
     "@stockwiki/wiki-bridge": "workspace:*"
   },
@@ -13,8 +14,8 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "dev": "tsx watch src/index.ts",
-    "lint": "eslint src --max-warnings=0",
-    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src test --max-warnings=0",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit --project tsconfig.json"
   }
 }

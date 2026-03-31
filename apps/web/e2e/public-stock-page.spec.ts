@@ -16,6 +16,8 @@ test("renders a second fixture-backed stock page", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "SK hynix" })).toBeVisible();
   await expect(page.getByText("198,500 KRW")).toBeVisible();
   await expect(page.getByText("Stale Snapshot")).toBeVisible();
+  await expect(page.getByText("1 pending revision")).toBeVisible();
+  await expect(page.getByRole("link", { name: "View Revision History" })).toBeVisible();
 });
 
 test("renders a visible noindex stock page fixture", async ({ page }) => {
@@ -30,4 +32,21 @@ test("returns the next not-found page for missing stock fixtures", async ({ page
 
   expect(response?.status()).toBe(404);
   await expect(page.getByText("This page could not be found.")).toBeVisible();
+});
+
+test("renders the stock history page with approved and pending revisions", async ({ page }) => {
+  await page.goto("/stocks/krx/000660/history");
+
+  await expect(page.getByRole("heading", { name: "Revision History" })).toBeVisible();
+  await expect(page.getByText("phase 2 pending revision")).toBeVisible();
+  await expect(page.getByText("approved revision")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Compare Approved vs Latest" })).toBeVisible();
+});
+
+test("renders the stock diff page for approved vs pending revisions", async ({ page }) => {
+  await page.goto("/stocks/krx/000660/diff/rev-1...rev-2");
+
+  await expect(page.getByRole("heading", { name: "Revision Diff" })).toBeVisible();
+  await expect(page.getByText("changed line(s)")).toBeVisible();
+  await expect(page.getByText(/^phase 2 pending revision$/)).toBeVisible();
 });

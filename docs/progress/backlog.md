@@ -1,12 +1,18 @@
 # Backlog
 
-## Phase 2 Backlog
+## Phase 3 Backlog
 
-1. WikiEngine read contract 를 history / diff / approved / latest revision 기준으로 Phase 2 범위에 맞게 확정
-2. FakeWikiEngine contract tests 를 approved / pending / reverted / recent changes 분기까지 확장
-3. web app 에 stock wiki revision metadata, history, diff read model 을 추가
-4. MediaWikiEngine skeleton 과 app shadow table 경계를 direct DB access 없이 스캐폴딩
-5. recent changes sync worker skeleton 을 `apps/workers` 에 추가
+1. contributor edit intent UI 와 edit summary 입력 플로우 추가
+2. pending revision 저장 API 또는 동등한 app flow 추가
+3. reviewer approve/reject action skeleton 과 mod queue basic 추가
+4. public page approved revision gating 을 edit/approve full flow 로 검증
+5. reputation event skeleton 추가
+
+## Deferred From Phase 2
+
+1. public read API endpoints (`/api/public/stocks/:market/:ticker/history`, `/diff`) 를 별도 slice 로 정리
+2. in-memory shadow store 를 persistent app DB adapter 로 교체
+3. MediaWikiEngine contract tests 와 real API fixture harness 추가
 
 ## Deferred From Phase 1
 

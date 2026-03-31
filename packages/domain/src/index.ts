@@ -6,7 +6,7 @@ export interface StockKey {
 export type PageKey = string;
 export type RevisionId = string;
 
-export type RevisionStatus = "approved" | "pending" | "reverted";
+export type RevisionStatus = "approved" | "pending" | "rejected" | "reverted";
 export type PageProtectionLevel = "open" | "semi_protected" | "reviewer_only" | "locked";
 
 export interface PageRevision {
@@ -25,6 +25,11 @@ export interface PageContent {
   latestRevisionId: RevisionId | null;
   revisions: PageRevision[];
   protectionLevel: PageProtectionLevel;
+}
+
+export interface HistoryQuery {
+  status?: RevisionStatus;
+  limit?: number;
 }
 
 export interface RenderedPage {
@@ -85,10 +90,46 @@ export interface RecentChangeBatch {
   nextCursor?: string;
 }
 
+export interface WikiPageShadowRecord {
+  canonicalKey: string;
+  lastEditedAt: string | null;
+  lastReviewedAt: string | null;
+  lastReviewedRevisionId: RevisionId | null;
+  lastSeenRevisionId: RevisionId | null;
+  mediawikiTitle: string;
+  protectionLevel: PageProtectionLevel;
+  status: RevisionStatus;
+}
+
+export interface WikiRevisionShadowRecord {
+  authorUserId: string | null;
+  createdAt: string;
+  pageCanonicalKey: string;
+  revisionId: RevisionId;
+  status: RevisionStatus;
+  summary: string;
+}
+
+export interface WikiShadowSnapshot {
+  pages: WikiPageShadowRecord[];
+  revisions: WikiRevisionShadowRecord[];
+}
+
+export interface WikiShadowStore {
+  exportSnapshot(): WikiShadowSnapshot;
+  upsertPage(record: WikiPageShadowRecord): void;
+  upsertRevision(record: WikiRevisionShadowRecord): void;
+}
+
+export interface WikiRecentChangesSyncResult {
+  pageCount: number;
+  revisionCount: number;
+}
+
 export interface WikiEngine {
   getPage(key: PageKey): Promise<PageContent | null>;
   getRenderedHtml(key: PageKey, revisionId?: RevisionId): Promise<RenderedPage>;
-  getHistory(key: PageKey): Promise<PageRevision[]>;
+  getHistory(key: PageKey, params?: HistoryQuery): Promise<PageRevision[]>;
   compareRevisions(key: PageKey, from: RevisionId, to: RevisionId): Promise<DiffResult>;
   createOrUpdatePage(input: EditPageInput): Promise<EditResult>;
   rollback(input: RollbackInput): Promise<RollbackResult>;

@@ -47,7 +47,7 @@ export function createPhase0WikiEngineContractSuite(name: string, createEngine: 
     it("returns approved content for public rendering", async () => {
       const engine = createEngine();
       const approved = await engine.createOrUpdatePage(makeEdit());
-      await engine.createOrUpdatePage(
+      const pending = await engine.createOrUpdatePage(
         makeEdit({
           summary: "new draft",
           contentMarkdown: "Draft that should not be public yet"
@@ -58,6 +58,11 @@ export function createPhase0WikiEngineContractSuite(name: string, createEngine: 
       expect(rendered.revisionId).toBe(approved.revisionId);
       expect(rendered.reviewed).toBe(true);
       expect(rendered.html).toContain("Initial approved revision");
+
+      const explicitPending = await engine.getRenderedHtml(phase0PageKey, pending.revisionId);
+      expect(explicitPending.revisionId).toBe(pending.revisionId);
+      expect(explicitPending.reviewed).toBe(false);
+      expect(explicitPending.html).toContain("Draft that should not be public yet");
     });
 
     it("compares revisions, protects pages, and rolls back", async () => {
@@ -92,6 +97,33 @@ export function createPhase0WikiEngineContractSuite(name: string, createEngine: 
 
       const rendered = await engine.getRenderedHtml(phase0PageKey);
       expect(rendered.html).toContain("Initial approved revision");
+    });
+
+    it("filters history to pending revisions and reports recent changes", async () => {
+      const engine = createEngine();
+      const approved = await engine.createOrUpdatePage(makeEdit());
+      const pending = await engine.createOrUpdatePage(
+        makeEdit({
+          summary: "phase 2 pending",
+          contentMarkdown: "Pending revision for review"
+        })
+      );
+
+      const getHistoryWithQuery = engine.getHistory.bind(engine) as (
+        key: string,
+        params?: { status?: "pending" | "approved"; limit?: number }
+      ) => Promise<Array<{ id: string; status: string }>>;
+      const pendingHistory = await getHistoryWithQuery(phase0PageKey, {
+        status: "pending"
+      });
+
+      expect(pendingHistory).toHaveLength(1);
+      expect(pendingHistory[0]?.id).toBe(pending.revisionId);
+      expect(pendingHistory[0]?.status).toBe("pending");
+
+      const recentChanges = await engine.getRecentChanges();
+      expect(recentChanges.items[0]?.revisionId).toBe(pending.revisionId);
+      expect(recentChanges.items[1]?.revisionId).toBe(approved.revisionId);
     });
   });
 }

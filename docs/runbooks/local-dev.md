@@ -2,7 +2,7 @@
 
 ## Goal
 
-Phase 0 하네스와 현재 Phase 1 public read slice를 로컬에서 검증한다.
+Phase 0 하네스와 현재 Phase 2 wiki/history/diff slice를 로컬에서 검증한다.
 
 ## Prerequisites
 
@@ -25,6 +25,10 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm check
+pnpm --filter @stockwiki/wiki-bridge test
+pnpm --filter @stockwiki/wiki-bridge typecheck
+pnpm --filter @stockwiki/workers test
+pnpm --filter @stockwiki/workers typecheck
 pnpm build
 pnpm --filter @stockwiki/web exec playwright install chromium
 pnpm --filter @stockwiki/web test:e2e
@@ -58,6 +62,10 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm check
+pnpm --filter @stockwiki/wiki-bridge test
+pnpm --filter @stockwiki/wiki-bridge typecheck
+pnpm --filter @stockwiki/workers test
+pnpm --filter @stockwiki/workers typecheck
 pnpm build
 pnpm --filter @stockwiki/web exec playwright install chromium
 pnpm --filter @stockwiki/web test:e2e
@@ -71,6 +79,10 @@ docker compose -f infra/compose/docker-compose.yml config
 - `node -v` returned `v24.13.1`
 - `pnpm -v` returned `10.32.1`
 - `pnpm check` passed
+- `pnpm --filter @stockwiki/wiki-bridge test` passed
+- `pnpm --filter @stockwiki/wiki-bridge typecheck` passed
+- `pnpm --filter @stockwiki/workers test` passed
+- `pnpm --filter @stockwiki/workers typecheck` passed
 - `pnpm build` passed
 - `pnpm --filter @stockwiki/web test:e2e` passed
 - `docker compose version` returned `Docker Compose version 5.1.1`

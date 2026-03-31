@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PhaseBadge } from "@stockwiki/ui";
 import type { StockPageData } from "./get-stock-page-data";
 
@@ -24,7 +25,7 @@ export function StockPageView(props: { data: StockPageData }) {
         gap: "1.5rem"
       }}
     >
-      <PhaseBadge>Phase 1 Read-Only Slice</PhaseBadge>
+      <PhaseBadge>Phase 2 Revision Slice</PhaseBadge>
 
       <header
         style={{
@@ -46,6 +47,25 @@ export function StockPageView(props: { data: StockPageData }) {
               {data.pageStateLabel}
             </span>
             <span style={{ color: "#334155", fontSize: "0.95rem" }}>{data.pageStateSummary}</span>
+          </div>
+          <div style={{ display: "grid", gap: "0.35rem" }}>
+            <span style={{ color: "#0f172a", fontWeight: 600 }}>
+              Public page pinned to approved revision {data.revisionSummary.approvedRevisionId}
+            </span>
+            <span style={{ color: "#475569", fontSize: "0.95rem" }}>
+              Latest revision {data.revisionSummary.latestRevisionId} is {data.revisionSummary.latestRevisionStatus}.
+              {` ${data.revisionSummary.pendingRevisionCount} pending revision${data.revisionSummary.pendingRevisionCount === 1 ? "" : "s"} waiting for review.`}
+            </span>
+            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+              <Link href={data.revisionSummary.historyPath} style={linkStyle}>
+                View Revision History
+              </Link>
+              {data.revisionSummary.latestDiffPath ? (
+                <Link href={data.revisionSummary.latestDiffPath} style={linkStyle}>
+                  Compare Approved vs Latest
+                </Link>
+              ) : null}
+            </div>
           </div>
         </div>
         <label style={{ display: "grid", gap: "0.5rem", maxWidth: "26rem" }}>
@@ -199,4 +219,10 @@ const dlStyle = {
   margin: 0,
   display: "grid",
   gap: "0.85rem"
+} as const;
+
+const linkStyle = {
+  color: "#0f172a",
+  fontWeight: 700,
+  textDecoration: "underline"
 } as const;

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildStockMetadata } from "../src/stock-page/build-stock-metadata";
 import { getStockPageData } from "../src/stock-page/get-stock-page-data";
 
-describe("phase 1 stock page", () => {
+describe("stock page read model", () => {
   it("loads fixture-backed stock page data with approved wiki content", async () => {
     const data = await getStockPageData({
       market: "krx",
@@ -71,6 +71,10 @@ describe("phase 1 stock page", () => {
     expect(data.quote.price).toBe(198500);
     expect(data.canonicalPath).toBe("/stocks/krx/000660");
     expect(data.indexable).toBe(true);
+    expect(data.wiki.html).toContain("approved revision");
+    expect(data.wiki.html).not.toContain("pending revision");
+    expect(data.revisionSummary.pendingRevisionCount).toBe(1);
+    expect(data.revisionSummary.historyPath).toBe("/stocks/krx/000660/history");
   });
 
   it("loads a visible but noindex stock page fixture", async () => {

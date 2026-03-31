@@ -115,6 +115,9 @@ importers:
 
   apps/workers:
     dependencies:
+      '@stockwiki/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
       '@stockwiki/fixtures':
         specifier: workspace:*
         version: link:../../packages/fixtures

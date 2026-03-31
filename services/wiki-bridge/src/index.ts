@@ -2,6 +2,7 @@ import type {
   DiffResult,
   EditPageInput,
   EditResult,
+  HistoryQuery,
   PageContent,
   PageKey,
   PageRevision,
@@ -25,6 +26,7 @@ interface StoredPage {
 
 export class FakeWikiEngine implements WikiEngine {
   private readonly pages = new Map<PageKey, StoredPage>();
+  private readonly clockBase = Date.parse("2026-01-01T00:00:00.000Z");
   private revisionSequence = 0;
 
   async getPage(key: PageKey): Promise<PageContent | null> {
@@ -52,8 +54,18 @@ export class FakeWikiEngine implements WikiEngine {
     };
   }
 
-  async getHistory(key: PageKey): Promise<PageRevision[]> {
-    return [...this.requirePage(key).revisions].reverse();
+  async getHistory(key: PageKey, params?: HistoryQuery): Promise<PageRevision[]> {
+    let revisions = [...this.requirePage(key).revisions].reverse();
+
+    if (params?.status) {
+      revisions = revisions.filter((revision) => revision.status === params.status);
+    }
+
+    if (params?.limit !== undefined) {
+      revisions = revisions.slice(0, params.limit);
+    }
+
+    return revisions;
   }
 
   async compareRevisions(key: PageKey, from: RevisionId, to: RevisionId): Promise<DiffResult> {
@@ -154,7 +166,7 @@ export class FakeWikiEngine implements WikiEngine {
       contentMarkdown: input.contentMarkdown,
       status,
       authorId: input.authorId,
-      createdAt: new Date().toISOString()
+      createdAt: new Date(this.clockBase + this.revisionSequence * 1000).toISOString()
     };
   }
 

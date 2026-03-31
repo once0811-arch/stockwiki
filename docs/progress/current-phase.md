@@ -1,24 +1,34 @@
 # Current Phase
 
-- current phase: Phase 2 - wiki bridge and revision model
+- current phase: Phase 3 - edit proposal flow
 - completed:
   - Phase 0 repository bootstrap closed with passing workspace checks
   - Phase 1 read-only stock page MVP closed
+  - Phase 2 wiki bridge and revision model closed
   - fixture-backed public stock routes now cover `005930`, `000660`, and `035420`
   - system data card, approved wiki panel, discussion preview placeholder, and search placeholder are wired from fake-first adapters
   - stock route metadata emits canonical URLs for indexable pages and noindex metadata for review-pending or missing pages
   - public read smoke now covers reviewed, stale snapshot, visible noindex, and not-found scenarios in Playwright
+  - public stock page now exposes approved/latest revision metadata and keeps pending edits off the default public render
+  - `/stocks/[market]/[ticker]/history` and `/stocks/[market]/[ticker]/diff/[from]...[to]` routes render basic history/diff UI
+  - `FakeWikiEngine` contract now covers pending history filtering, explicit revision render, and deterministic recent changes ordering
+  - app shadow metadata contracts, in-memory shadow store, MediaWikiEngine skeleton, and recent changes sync worker skeleton were added
+  - Ralph Loop rework fixed shadow page metadata so recent changes sync preserves latest revision status and last-edited timestamp
   - `docs/prd/stockwiki-prd.md` restored to the full root PRD to prevent source-of-truth drift
   - first-session Ralph prompt updated to preserve the canonical PRD and avoid hard-coding the completion token in example text
 - in progress:
-  - scoping the first Phase 2 slice around revision history and approved/pending state branches
+  - scoping contributor edit intent and pending revision save flow for Phase 3
 - blockers:
   - none
 - next slice:
-  - expose revision history and diff read models for a stock wiki page
-  - extend FakeWikiEngine and worker scaffolding for approved/pending/recent-changes flows
+  - add contributor edit intent UI and pending revision creation path
+  - add reviewer queue entrypoint and approve/reject skeleton endpoints
 - verification snapshot:
   - `pnpm check` passed
+  - `pnpm --filter @stockwiki/wiki-bridge test` passed
+  - `pnpm --filter @stockwiki/wiki-bridge typecheck` passed
+  - `pnpm --filter @stockwiki/workers test` passed
+  - `pnpm --filter @stockwiki/workers typecheck` passed
   - `pnpm --filter @stockwiki/web build` passed
   - `pnpm --filter @stockwiki/web exec playwright install chromium` passed
   - `pnpm --filter @stockwiki/web test:e2e` passed

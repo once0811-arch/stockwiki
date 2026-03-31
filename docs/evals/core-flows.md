@@ -22,6 +22,14 @@ Phase 별로 반드시 검증해야 할 핵심 사용자 흐름을 정리한다.
 - missing stock route returns the Next.js not-found page
 - Playwright public read smoke covers reviewed, stale snapshot, noindex, and not-found scenarios
 
+## Phase 2
+
+- `FakeWikiEngine` keeps public render pinned to approved revision while latest pending revision appears in history
+- `/stocks/[market]/[ticker]/history` renders revision id, summary, author, time, and status
+- `/stocks/[market]/[ticker]/diff/[from]...[to]` renders a basic approved-vs-latest diff shell
+- recent changes sync copies revision metadata into app shadow records without direct MediaWiki DB access
+- `MediaWikiEngine` remains an official-API-only skeleton until real integration phase
+
 ## Contract Eval Targets
 
 ### WikiEngine

@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./mediawiki-engine": "./src/mediawiki-engine.ts",
+    "./shadow-store": "./src/shadow-store.ts"
   },
   "dependencies": {
     "@stockwiki/domain": "workspace:*"
