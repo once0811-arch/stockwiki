@@ -1,0 +1,16 @@
+{
+  "name": "@stockwiki/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "node -e \"console.log('domain package has no dev process')\"",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit --project tsconfig.json"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "phase": "Phase 0",
+  "sourceOfTruth": [
+    "docs/prd/stockwiki-prd.md",
+    "docs/adr",
+    "AGENTS.md"
+  ],
+  "commands": [
+    ".claude/commands/phase-plan.md",
+    ".claude/commands/ship-slice.md"
+  ],
+  "hooks": [
+    "scripts/hooks/post-edit-check.sh",
+    "scripts/hooks/guard-secrets.sh"
+  ],
+  "policies": {
+    "fakeFirst": true,
+    "singlePhaseOnly": true,
+    "mediaWikiDbDirectAccess": false
+  }
+}

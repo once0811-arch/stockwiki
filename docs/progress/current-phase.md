@@ -1,0 +1,29 @@
+# Current Phase
+
+- current phase: Phase 0 - repository bootstrap
+- completed:
+  - session checklist executed against the current filesystem state
+  - root PRD, `AGENTS.md`, `CLAUDE.md`, and first execution prompt reviewed
+  - canonical docs scaffold created under `docs/`
+  - `pnpm` workspace and `turbo` monorepo skeleton created
+  - `apps/web`, `apps/api`, `apps/workers`, `services/wiki-bridge`, `packages/*` initialized
+  - `WikiEngine`, `FakeWikiEngine`, `MarketDataProvider`, and `FixtureMarketDataProvider` contracts implemented
+  - web health and smoke routes plus api health endpoint implemented
+  - unit and smoke/e2e placeholder tests added and passing
+  - `docker compose config` validated after installing Docker CLI and compose plugin
+- in progress:
+  - none
+- blockers:
+  - none
+- next slice:
+  - Phase 1 read-only stock page MVP using fixture market data and approved wiki content
+- verification snapshot:
+  - `node -v` passed
+  - `pnpm -v` passed
+  - `pnpm lint` passed
+  - `pnpm typecheck` passed
+  - `pnpm test` passed
+  - `pnpm check` passed
+  - `pnpm build` passed
+  - `docker compose version` passed
+  - `docker compose -f infra/compose/docker-compose.yml config` passed

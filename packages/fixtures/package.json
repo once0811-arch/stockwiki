@@ -1,0 +1,23 @@
+{
+  "name": "@stockwiki/fixtures",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@stockwiki/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@stockwiki/testkit": "workspace:*",
+    "vitest": "4.1.2"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "node -e \"console.log('fixtures package has no dev process')\"",
+    "lint": "eslint src test --max-warnings=0",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit --project tsconfig.json"
+  }
+}

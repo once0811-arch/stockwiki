@@ -1,0 +1,20 @@
+{
+  "name": "@stockwiki/testkit",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@stockwiki/domain": "workspace:*",
+    "vitest": "4.1.2"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json",
+    "dev": "node -e \"console.log('testkit package has no dev process')\"",
+    "lint": "eslint src --max-warnings=0",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc --noEmit --project tsconfig.json"
+  }
+}
