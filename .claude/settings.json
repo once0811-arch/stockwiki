@@ -1,5 +1,5 @@
 {
-  "phase": "Phase 0",
+  "phase": "Phase 4",
   "sourceOfTruth": [
     "docs/prd/stockwiki-prd.md",
     "docs/adr",

@@ -109,6 +109,41 @@ export class FakeWikiEngine implements WikiEngine {
     };
   }
 
+  seedRevision(
+    input: EditPageInput & {
+      revisionId?: RevisionId;
+      status: PageRevision["status"];
+    }
+  ): EditResult {
+    const page = this.pages.get(input.key);
+    const revision = this.makeRevision(input, input.status, input.revisionId);
+
+    if (!page) {
+      this.pages.set(input.key, {
+        key: input.key,
+        title: input.title,
+        approvedRevisionId: input.status === "approved" ? revision.id : null,
+        latestRevisionId: revision.id,
+        revisions: [revision],
+        protectionLevel: "open"
+      });
+    } else {
+      page.title = input.title;
+      page.latestRevisionId = revision.id;
+      page.revisions.push(revision);
+
+      if (input.status === "approved") {
+        page.approvedRevisionId = revision.id;
+      }
+    }
+
+    return {
+      key: input.key,
+      revisionId: revision.id,
+      status: revision.status
+    };
+  }
+
   async rollback(input: RollbackInput): Promise<RollbackResult> {
     const page = this.requirePage(input.key);
     const target = this.requireRevision(page, input.toRevisionId);
@@ -157,11 +192,15 @@ export class FakeWikiEngine implements WikiEngine {
     };
   }
 
-  private makeRevision(input: EditPageInput, status: PageRevision["status"]): PageRevision {
+  private makeRevision(
+    input: EditPageInput,
+    status: PageRevision["status"],
+    explicitRevisionId?: RevisionId
+  ): PageRevision {
     this.revisionSequence += 1;
 
     return {
-      id: `rev-${this.revisionSequence}`,
+      id: explicitRevisionId ?? `rev-${this.revisionSequence}`,
       summary: input.summary,
       contentMarkdown: input.contentMarkdown,
       status,

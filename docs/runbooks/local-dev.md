@@ -2,7 +2,7 @@
 
 ## Goal
 
-Phase 0 하네스와 현재 Phase 2 wiki/history/diff slice를 로컬에서 검증한다.
+Phase 3 review workflow 완료 상태와 다음 Phase 4 진입 기준을 로컬에서 검증한다.
 
 ## Prerequisites
 
@@ -21,6 +21,8 @@ pnpm install
 ### Verification
 
 ```bash
+pnpm lint:docs
+pnpm validate:docs
 pnpm lint
 pnpm typecheck
 pnpm test
@@ -29,9 +31,13 @@ pnpm --filter @stockwiki/wiki-bridge test
 pnpm --filter @stockwiki/wiki-bridge typecheck
 pnpm --filter @stockwiki/workers test
 pnpm --filter @stockwiki/workers typecheck
+pnpm --filter @stockwiki/web typecheck
+pnpm --filter @stockwiki/web test
 pnpm build
 pnpm --filter @stockwiki/web exec playwright install chromium
 pnpm --filter @stockwiki/web test:e2e
+./scripts/hooks/guard-secrets.sh
+./scripts/hooks/post-edit-check.sh
 docker compose -f infra/compose/docker-compose.yml config
 ```
 
@@ -58,6 +64,8 @@ mkdir -p ~/.docker
 node -v
 pnpm -v
 pnpm install
+pnpm lint:docs
+pnpm validate:docs
 pnpm lint
 pnpm typecheck
 pnpm test
@@ -66,9 +74,18 @@ pnpm --filter @stockwiki/wiki-bridge test
 pnpm --filter @stockwiki/wiki-bridge typecheck
 pnpm --filter @stockwiki/workers test
 pnpm --filter @stockwiki/workers typecheck
+pnpm --filter @stockwiki/web test -- tests/edit-flow.test.ts
+pnpm --filter @stockwiki/web test:e2e --grep "edit entry|pending edit proposal"
+pnpm --filter @stockwiki/web test:e2e --grep "gates edit entry for anonymous and non-contributor users"
+pnpm --filter @stockwiki/web test:e2e --grep "contributor edit to reviewer approval flow|reviewer reject"
+pnpm --filter @stockwiki/web typecheck
+pnpm --filter @stockwiki/web test
+pnpm --filter @stockwiki/web build
 pnpm build
 pnpm --filter @stockwiki/web exec playwright install chromium
 pnpm --filter @stockwiki/web test:e2e
+./scripts/hooks/guard-secrets.sh
+./scripts/hooks/post-edit-check.sh
 brew install docker docker-compose
 docker compose version
 docker compose -f infra/compose/docker-compose.yml config
@@ -83,8 +100,19 @@ docker compose -f infra/compose/docker-compose.yml config
 - `pnpm --filter @stockwiki/wiki-bridge typecheck` passed
 - `pnpm --filter @stockwiki/workers test` passed
 - `pnpm --filter @stockwiki/workers typecheck` passed
+- `pnpm --filter @stockwiki/web test -- tests/edit-flow.test.ts` passed after implementing the Phase 3 slice
+- `pnpm --filter @stockwiki/web test:e2e --grep "edit entry|pending edit proposal"` passed after implementing the Phase 3 slice
+- `pnpm --filter @stockwiki/web test:e2e --grep "gates edit entry for anonymous and non-contributor users"` passed after adding the demo login shell
+- `pnpm --filter @stockwiki/web test:e2e --grep "contributor edit to reviewer approval flow|reviewer reject"` passed when closing Phase 3
+- `pnpm --filter @stockwiki/web typecheck` passed
+- `pnpm --filter @stockwiki/web test` passed
+- `pnpm --filter @stockwiki/web build` passed
 - `pnpm build` passed
 - `pnpm --filter @stockwiki/web test:e2e` passed
+- `pnpm lint:docs` passed
+- `pnpm validate:docs` passed
+- `./scripts/hooks/guard-secrets.sh` passed
+- `./scripts/hooks/post-edit-check.sh` passed
 - `docker compose version` returned `Docker Compose version 5.1.1`
 - `docker compose -f infra/compose/docker-compose.yml config` passed
 

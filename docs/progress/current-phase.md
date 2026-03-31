@@ -1,10 +1,11 @@
 # Current Phase
 
-- current phase: Phase 3 - edit proposal flow
+- current phase: Phase 4 - citation and trust policy
 - completed:
   - Phase 0 repository bootstrap closed with passing workspace checks
   - Phase 1 read-only stock page MVP closed
   - Phase 2 wiki bridge and revision model closed
+  - Phase 3 edit proposal flow closed
   - fixture-backed public stock routes now cover `005930`, `000660`, and `035420`
   - system data card, approved wiki panel, discussion preview placeholder, and search placeholder are wired from fake-first adapters
   - stock route metadata emits canonical URLs for indexable pages and noindex metadata for review-pending or missing pages
@@ -16,19 +17,30 @@
   - Ralph Loop rework fixed shadow page metadata so recent changes sync preserves latest revision status and last-edited timestamp
   - `docs/prd/stockwiki-prd.md` restored to the full root PRD to prevent source-of-truth drift
   - first-session Ralph prompt updated to preserve the canonical PRD and avoid hard-coding the completion token in example text
+  - `/login` now provides a fake-first demo login shell for role-based edit and review flows
+  - `/stocks/[market]/[ticker]/edit` now gates anonymous, member, contributor, and reviewer entry with a fake session harness
+  - `POST /api/wiki/edit-intents` now saves fake-first pending edit drafts with required edit summary and proposed content
+  - `/review/mod-queue` now lists pending edit proposals with diff preview links and approve/reject actions
+  - `POST /api/wiki/review/[revisionId]/approve` and `/reject` now change review state and write fake-first reputation events
+  - Phase 3 keeps the public stock page pinned to approved content while pending edits wait in queue, then updates the public render only after reviewer approval
+  - Phase 0 debt cleanup added a GitHub Actions CI skeleton, markdown lint/docs validation commands, real hook scripts, and a dedicated debt ledger
+  - conservative Phase 0-3 review closed the root-level script lint/typecheck gap and aligned markdown lint with the current document corpus
 - in progress:
-  - scoping contributor edit intent and pending revision save flow for Phase 3
+  - scoping citation helper UI and source presence policy for Phase 4
 - blockers:
   - none
 - next slice:
-  - add contributor edit intent UI and pending revision creation path
-  - add reviewer queue entrypoint and approve/reject skeleton endpoints
+  - add citation helper UI and source-tier scaffolding
+  - add source presence checks and outdated-source warnings on edit proposals
 - verification snapshot:
-  - `pnpm check` passed
-  - `pnpm --filter @stockwiki/wiki-bridge test` passed
-  - `pnpm --filter @stockwiki/wiki-bridge typecheck` passed
-  - `pnpm --filter @stockwiki/workers test` passed
-  - `pnpm --filter @stockwiki/workers typecheck` passed
+  - `pnpm --filter @stockwiki/web test -- tests/edit-flow.test.ts` passed
+  - `pnpm --filter @stockwiki/web test:e2e --grep "gates edit entry for anonymous and non-contributor users"` passed
+  - `pnpm --filter @stockwiki/web test:e2e --grep "contributor edit to reviewer approval flow|reviewer reject"` passed
   - `pnpm --filter @stockwiki/web build` passed
-  - `pnpm --filter @stockwiki/web exec playwright install chromium` passed
   - `pnpm --filter @stockwiki/web test:e2e` passed
+  - `pnpm lint:docs` passed
+  - `pnpm validate:docs` passed
+  - `./scripts/hooks/guard-secrets.sh` passed
+  - `./scripts/hooks/post-edit-check.sh` passed
+  - `docker compose -f infra/compose/docker-compose.yml config` passed
+  - `pnpm check` passed

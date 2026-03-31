@@ -5,6 +5,14 @@ export interface StockKey {
 
 export type PageKey = string;
 export type RevisionId = string;
+export type UserRole =
+  | "reader"
+  | "member"
+  | "contributor"
+  | "trusted_contributor"
+  | "reviewer"
+  | "moderator"
+  | "admin";
 
 export type RevisionStatus = "approved" | "pending" | "rejected" | "reverted";
 export type PageProtectionLevel = "open" | "semi_protected" | "reviewer_only" | "locked";

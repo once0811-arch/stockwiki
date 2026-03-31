@@ -1,12 +1,19 @@
 # Backlog
 
-## Phase 3 Backlog
+상세 debt ledger: `docs/progress/debt-ledger.md`
 
-1. contributor edit intent UI 와 edit summary 입력 플로우 추가
-2. pending revision 저장 API 또는 동등한 app flow 추가
-3. reviewer approve/reject action skeleton 과 mod queue basic 추가
-4. public page approved revision gating 을 edit/approve full flow 로 검증
-5. reputation event skeleton 추가
+## Phase 4 Backlog
+
+1. citation helper UI 와 source tier scaffolding 추가
+2. source presence checks 와 outdated source warnings 추가
+3. report reason `no citation` 과 moderation rule hook 추가
+4. contentious edit queue 와 citation-required section rule 을 연결
+
+## Deferred From Phase 3
+
+1. fake session harness 와 web route shell 을 앱 auth/API 경계에 맞게 치환
+2. in-memory review queue 와 reputation event store 를 persistent app DB adapter 로 교체
+3. demo login shell 을 real auth/session flow 로 치환
 
 ## Deferred From Phase 2
 
@@ -22,5 +29,3 @@
 
 1. local infra 실제 기동 smoke (`docker compose up`) 와 healthcheck 추가
 2. MediaWiki extension profiles 세분화
-3. CI workflow skeleton
-4. markdown lint and doc validation hooks

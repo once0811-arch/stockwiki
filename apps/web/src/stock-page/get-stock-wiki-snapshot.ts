@@ -1,6 +1,7 @@
 import type { CompanyProfile, DiffResult, PageContent, PageRevision, RenderedPage, RevisionStatus, StockKey } from "@stockwiki/domain";
 import { FakeWikiEngine } from "@stockwiki/wiki-bridge";
 import { getStockPageSeed } from "./stock-page-seeds";
+import { listStoredEditProposals } from "../wiki-edit/pending-edit-store";
 
 export interface StockRevisionSummary {
   approvedRevisionId: string;
@@ -37,6 +38,18 @@ export async function getStockWikiSnapshot(input: {
       summary: revision.summary,
       contentMarkdown: revision.contentMarkdown,
       authorId: revision.authorId
+    });
+  }
+
+  for (const draft of listStoredEditProposals(input.profile.canonicalPageKey)) {
+    engine.seedRevision({
+      key: draft.pageKey,
+      revisionId: draft.revisionId,
+      status: draft.status,
+      title: draft.title,
+      summary: draft.summary,
+      contentMarkdown: draft.contentMarkdown,
+      authorId: draft.authorId
     });
   }
 

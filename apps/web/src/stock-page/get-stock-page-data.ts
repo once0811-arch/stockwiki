@@ -7,6 +7,7 @@ export interface StockPageData {
   canonicalPath: string;
   corporateActions: CorporateAction[];
   discussionPreview: DiscussionPreviewItem[];
+  editPath: string;
   filings: Filing[];
   indexable: boolean;
   pageState: StockPageState;
@@ -21,7 +22,7 @@ export interface StockPageData {
 
 const marketDataProvider = new FixtureMarketDataProvider();
 
-export async function getStockPageData(input: StockKey): Promise<StockPageData> {
+export async function getStockPageData(input: StockKey, actor?: string): Promise<StockPageData> {
   const key = normalizeStockKey(input);
   const profile = await marketDataProvider.getCompanyProfile(key);
   const quote = await marketDataProvider.getQuote(key);
@@ -36,6 +37,7 @@ export async function getStockPageData(input: StockKey): Promise<StockPageData> 
     canonicalPath: `/stocks/${key.market.toLowerCase()}/${key.ticker}`,
     corporateActions,
     discussionPreview: snapshot.seed.discussionPreview,
+    editPath: buildEditPath(key, actor),
     filings,
     indexable: snapshot.seed.indexable && snapshot.wiki.reviewed,
     pageState: snapshot.seed.pageState,
@@ -47,6 +49,16 @@ export async function getStockPageData(input: StockKey): Promise<StockPageData> 
     searchPlaceholder: "Search placeholder for aliases, filings, and related pages",
     wiki: snapshot.wiki
   };
+}
+
+function buildEditPath(key: StockKey, actor?: string): string {
+  const basePath = `/stocks/${key.market.toLowerCase()}/${key.ticker}/edit`;
+
+  if (!actor) {
+    return basePath;
+  }
+
+  return `${basePath}?actor=${encodeURIComponent(actor)}`;
 }
 
 function normalizeStockKey(input: StockKey): StockKey {

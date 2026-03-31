@@ -30,6 +30,17 @@ Phase 별로 반드시 검증해야 할 핵심 사용자 흐름을 정리한다.
 - recent changes sync copies revision metadata into app shadow records without direct MediaWiki DB access
 - `MediaWikiEngine` remains an official-API-only skeleton until real integration phase
 
+## Phase 3
+
+- `/stocks/[market]/[ticker]/edit` gates anonymous, member, contributor, and reviewer access according to the fake-first role harness
+- anonymous edit entry can continue through the demo login shell before returning with a role-scoped session
+- contributor edit submission requires an edit summary and proposed content
+- `POST /api/wiki/edit-intents` creates a pending edit draft without changing the public approved render
+- pending edit submission becomes visible in revision history and pending revision counts
+- `/review/mod-queue` exposes pending proposals, diff preview links, and approve/reject actions for reviewer users
+- reviewer approval updates the public approved render and emits a reputation event
+- reviewer rejection keeps the public render unchanged while history records the rejected status
+
 ## Contract Eval Targets
 
 ### WikiEngine

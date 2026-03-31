@@ -25,7 +25,7 @@ export function StockPageView(props: { data: StockPageData }) {
         gap: "1.5rem"
       }}
     >
-      <PhaseBadge>Phase 2 Revision Slice</PhaseBadge>
+      <PhaseBadge>Phase 3 Review Workflow Slice</PhaseBadge>
 
       <header
         style={{
@@ -57,6 +57,9 @@ export function StockPageView(props: { data: StockPageData }) {
               {` ${data.revisionSummary.pendingRevisionCount} pending revision${data.revisionSummary.pendingRevisionCount === 1 ? "" : "s"} waiting for review.`}
             </span>
             <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+              <Link href={data.editPath} style={linkStyle}>
+                Edit This Page
+              </Link>
               <Link href={data.revisionSummary.historyPath} style={linkStyle}>
                 View Revision History
               </Link>

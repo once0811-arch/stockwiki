@@ -1,0 +1,26 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint-cli2/main/schema/markdownlint-cli2-config-schema.json",
+  "globs": [
+    "*.md",
+    "docs/**/*.md"
+  ],
+  "ignores": [
+    "node_modules/**",
+    ".next/**",
+    "dist/**",
+    ".turbo/**"
+  ],
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD022": false,
+    "MD024": false,
+    "MD025": false,
+    "MD031": false,
+    "MD032": false,
+    "MD033": false,
+    "MD034": false,
+    "MD041": false,
+    "MD047": false
+  }
+}

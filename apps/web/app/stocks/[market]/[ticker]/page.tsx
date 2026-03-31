@@ -9,6 +9,9 @@ interface StockPageRouteProps {
     market: string;
     ticker: string;
   }>;
+  searchParams: Promise<{
+    actor?: string | string[];
+  }>;
 }
 
 export async function generateMetadata(props: StockPageRouteProps): Promise<Metadata> {
@@ -33,9 +36,11 @@ export async function generateMetadata(props: StockPageRouteProps): Promise<Meta
 
 export default async function StockPage(props: StockPageRouteProps) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
+  const actor = Array.isArray(searchParams.actor) ? searchParams.actor[0] : searchParams.actor;
 
   try {
-    const data = await getStockPageData(params);
+    const data = await getStockPageData(params, actor);
     return <StockPageView data={data} />;
   } catch {
     notFound();
