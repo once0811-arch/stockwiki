@@ -16,4 +16,16 @@ describe("FixtureMarketDataProvider", () => {
       ticker: "005930"
     });
   });
+
+  it("returns the phase 1 secondary fixture quote", async () => {
+    const provider = new FixtureMarketDataProvider();
+    await expect(
+      provider.getQuote({
+        market: "KRX",
+        ticker: "000660"
+      })
+    ).resolves.toMatchObject({
+      ticker: "000660"
+    });
+  });
 });

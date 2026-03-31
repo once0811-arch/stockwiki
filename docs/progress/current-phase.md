@@ -1,29 +1,24 @@
 # Current Phase
 
-- current phase: Phase 0 - repository bootstrap
+- current phase: Phase 2 - wiki bridge and revision model
 - completed:
-  - session checklist executed against the current filesystem state
-  - root PRD, `AGENTS.md`, `CLAUDE.md`, and first execution prompt reviewed
-  - canonical docs scaffold created under `docs/`
-  - `pnpm` workspace and `turbo` monorepo skeleton created
-  - `apps/web`, `apps/api`, `apps/workers`, `services/wiki-bridge`, `packages/*` initialized
-  - `WikiEngine`, `FakeWikiEngine`, `MarketDataProvider`, and `FixtureMarketDataProvider` contracts implemented
-  - web health and smoke routes plus api health endpoint implemented
-  - unit and smoke/e2e placeholder tests added and passing
-  - `docker compose config` validated after installing Docker CLI and compose plugin
+  - Phase 0 repository bootstrap closed with passing workspace checks
+  - Phase 1 read-only stock page MVP closed
+  - fixture-backed public stock routes now cover `005930`, `000660`, and `035420`
+  - system data card, approved wiki panel, discussion preview placeholder, and search placeholder are wired from fake-first adapters
+  - stock route metadata emits canonical URLs for indexable pages and noindex metadata for review-pending or missing pages
+  - public read smoke now covers reviewed, stale snapshot, visible noindex, and not-found scenarios in Playwright
+  - `docs/prd/stockwiki-prd.md` restored to the full root PRD to prevent source-of-truth drift
+  - first-session Ralph prompt updated to preserve the canonical PRD and avoid hard-coding the completion token in example text
 - in progress:
-  - none
+  - scoping the first Phase 2 slice around revision history and approved/pending state branches
 - blockers:
   - none
 - next slice:
-  - Phase 1 read-only stock page MVP using fixture market data and approved wiki content
+  - expose revision history and diff read models for a stock wiki page
+  - extend FakeWikiEngine and worker scaffolding for approved/pending/recent-changes flows
 - verification snapshot:
-  - `node -v` passed
-  - `pnpm -v` passed
-  - `pnpm lint` passed
-  - `pnpm typecheck` passed
-  - `pnpm test` passed
   - `pnpm check` passed
-  - `pnpm build` passed
-  - `docker compose version` passed
-  - `docker compose -f infra/compose/docker-compose.yml config` passed
+  - `pnpm --filter @stockwiki/web build` passed
+  - `pnpm --filter @stockwiki/web exec playwright install chromium` passed
+  - `pnpm --filter @stockwiki/web test:e2e` passed

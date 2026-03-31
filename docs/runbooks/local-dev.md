@@ -2,7 +2,7 @@
 
 ## Goal
 
-Phase 0 기준으로 StockWiki 하네스를 로컬에서 부트스트랩하고 최소 검증을 수행한다.
+Phase 0 하네스와 현재 Phase 1 public read slice를 로컬에서 검증한다.
 
 ## Prerequisites
 
@@ -26,6 +26,8 @@ pnpm typecheck
 pnpm test
 pnpm check
 pnpm build
+pnpm --filter @stockwiki/web exec playwright install chromium
+pnpm --filter @stockwiki/web test:e2e
 docker compose -f infra/compose/docker-compose.yml config
 ```
 
@@ -57,6 +59,8 @@ pnpm typecheck
 pnpm test
 pnpm check
 pnpm build
+pnpm --filter @stockwiki/web exec playwright install chromium
+pnpm --filter @stockwiki/web test:e2e
 brew install docker docker-compose
 docker compose version
 docker compose -f infra/compose/docker-compose.yml config
@@ -68,6 +72,7 @@ docker compose -f infra/compose/docker-compose.yml config
 - `pnpm -v` returned `10.32.1`
 - `pnpm check` passed
 - `pnpm build` passed
+- `pnpm --filter @stockwiki/web test:e2e` passed
 - `docker compose version` returned `Docker Compose version 5.1.1`
 - `docker compose -f infra/compose/docker-compose.yml config` passed
 

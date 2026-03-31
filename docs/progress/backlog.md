@@ -1,13 +1,16 @@
 # Backlog
 
-## Phase 1 Backlog
+## Phase 2 Backlog
 
-1. Fixture 기반 stock master 와 market snapshot read model 추가
-2. public stock page SSR route 와 metadata 구현
-3. approved wiki panel 을 `FakeWikiEngine` 로 연결
-4. discussion preview placeholder 를 stock page 에 노출
-5. search box placeholder 와 canonical URL 규칙 추가
-6. stock page smoke test 를 Playwright 또는 동등한 브라우저 레이어로 확장
+1. WikiEngine read contract 를 history / diff / approved / latest revision 기준으로 Phase 2 범위에 맞게 확정
+2. FakeWikiEngine contract tests 를 approved / pending / reverted / recent changes 분기까지 확장
+3. web app 에 stock wiki revision metadata, history, diff read model 을 추가
+4. MediaWikiEngine skeleton 과 app shadow table 경계를 direct DB access 없이 스캐폴딩
+5. recent changes sync worker skeleton 을 `apps/workers` 에 추가
+
+## Deferred From Phase 1
+
+1. discussion preview read model 을 실제 토론 도메인 shape 에 더 가깝게 정리
 
 ## Deferred From Phase 0
 

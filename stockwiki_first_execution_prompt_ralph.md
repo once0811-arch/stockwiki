@@ -4,7 +4,7 @@
 
 ## completion promise
 
-`STOCKWIKI_PHASE0_COMPLETE`
+Phase 0 completion promise는 `AGENTS.md` 9.1에 정의된 첫 세션 completion token을 사용한다.
 
 ## 권장 사용 방식
 
@@ -12,6 +12,7 @@
   - `AGENTS.md`
   - `CLAUDE.md`
   - `docs/prd/stockwiki-prd.md`
+- 루트에 `stockwiki_prd_harness_v1.md` 같은 원본 PRD가 있다면, 첫 세션에서 `docs/prd/stockwiki-prd.md` 는 **요약본이 아니라 전체 요구사항을 보존한 canonical copy** 로 맞춘다.
 - 그 다음 Claude Code에서 이 프롬프트를 넣고 Ralph Loop로 시작한다.
 - 이 세션에서는 **기능 구현이 아니라 하네스와 저장소 기반 구축**만 한다.
 
@@ -60,6 +61,10 @@ Scope for this session:
 11. Make local setup runnable from docs/runbooks/local-dev.md.
 12. Update docs/progress/current-phase.md after each meaningful milestone.
 
+Important PRD preservation rule:
+- If `stockwiki_prd_harness_v1.md` exists in the repository root and `docs/prd/stockwiki-prd.md` is missing, initialize `docs/prd/stockwiki-prd.md` from it without compressing or omitting future-phase requirements.
+- Do not replace the PRD with a short summary that drops Phase 1+ constraints. Future sessions must be able to rely on `docs/prd/stockwiki-prd.md` alone.
+
 Hard constraints:
 - Phase 0 only. Do not build stock pages, auth, discussions, approvals, search UX, or real moderation flows yet.
 - No real external API integration.
@@ -91,8 +96,8 @@ VERIFIED
 NEXT
 BLOCKERS
 
-Do not output the exact string STOCKWIKI_PHASE0_COMPLETE unless every completion criterion above is fully satisfied.
-When all criteria are satisfied, place STOCKWIKI_PHASE0_COMPLETE on its own line at the very end of the final response.
+Do not output the project-defined Phase 0 completion token unless every completion criterion above is fully satisfied.
+When all criteria are satisfied, place that Phase 0 completion token on its own line at the very end of the final response.
 ```
 
 ## Ralph Loop 실행 예시
@@ -100,7 +105,7 @@ When all criteria are satisfied, place STOCKWIKI_PHASE0_COMPLETE on its own line
 아래 형식으로 시작하면 된다.
 
 ```text
-/ralph-loop "<위 프롬프트 전체를 붙여넣기>" --max-iterations 20 --completion-promise "STOCKWIKI_PHASE0_COMPLETE"
+/ralph-loop "<위 프롬프트 전체를 붙여넣기>" --max-iterations 20 --completion-promise "<Phase 0 token from AGENTS.md>"
 ```
 
 ## 운영 메모
