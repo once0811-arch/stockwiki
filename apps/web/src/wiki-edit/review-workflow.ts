@@ -9,6 +9,7 @@ import {
   reviewStoredEditProposal
 } from "./pending-edit-store";
 import { getChangedSectionLabels } from "./source-policy";
+import { notifyWatchersOfApprovedRevision } from "../watchlist/watchlist-actions";
 
 const marketDataProvider = new FixtureMarketDataProvider();
 
@@ -108,6 +109,13 @@ export async function approveStockEditProposal(input: {
     reviewerId: session.userId,
     revisionId: input.revisionId,
     status: "approved"
+  });
+  notifyWatchersOfApprovedRevision({
+    actorId: session.userId,
+    pageKey: proposal.pageKey,
+    pageTitle: proposal.title,
+    revisionId: proposal.revisionId,
+    summary: `${proposal.title} approved revision is now live: ${proposal.summary}`
   });
 
   return {

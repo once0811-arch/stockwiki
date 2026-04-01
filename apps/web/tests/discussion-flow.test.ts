@@ -10,10 +10,12 @@ import {
 import { getStockDiscussionPageData } from "../src/discussion/discussion-read-model";
 import { resetDiscussionStore } from "../src/discussion/discussion-store";
 import { getStockPageData } from "../src/stock-page/get-stock-page-data";
+import { resetWatchlistStore } from "../src/watchlist/watchlist-store";
 
 describe("phase 5 discussion flow", () => {
   beforeEach(() => {
     resetDiscussionStore();
+    resetWatchlistStore();
   });
 
   it("loads fixture-backed discussion threads and summary counts", async () => {

@@ -68,6 +68,15 @@ Phase 별로 반드시 검증해야 할 핵심 사용자 흐름을 정리한다.
 - stock pages expose a live search form that routes into `/search`
 - worker search indexing skeleton surfaces handled event kinds and lag metrics for approved review, alias update, and discussion created events
 
+## Phase 7
+
+- stock pages expose watchlist add/remove controls and a notification center link for member-or-higher fake sessions
+- `/me/watchlist` renders watched pages, in-app notification cards, and a digest email stub without moving watch state into the wiki engine
+- approved revision notifications fan out from reviewer approval to page watchers while excluding the acting reviewer
+- discussion reply notifications fan out from comment submission to page watchers while keeping article content unchanged
+- worker digest shell groups unread notifications by recipient using the shared notification contract
+- Playwright watchlist flow covers watch add, approved revision notify, and notification center visibility
+
 ## Contract Eval Targets
 
 ### WikiEngine

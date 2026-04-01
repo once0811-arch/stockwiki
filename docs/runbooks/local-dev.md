@@ -2,7 +2,7 @@
 
 ## Goal
 
-Phase 6 search shell 완료 상태를 로컬에서 검증하고, 다음 Phase 7 watchlist slice 진입 기준을 유지한다.
+Phase 7 watchlist / notification shell 완료 상태를 로컬에서 검증하고, 다음 Phase 8 MediaWiki integration slice 진입 기준을 유지한다.
 
 ## Prerequisites
 
@@ -37,7 +37,7 @@ corepack pnpm --filter @stockwiki/workers typecheck
 corepack pnpm --filter @stockwiki/workers test
 corepack pnpm --filter @stockwiki/web typecheck
 corepack pnpm --filter @stockwiki/fixtures test
-corepack pnpm --filter @stockwiki/web test -- tests/source-policy.test.ts tests/stock-page.test.tsx tests/edit-flow.test.ts tests/discussion-flow.test.ts tests/search-flow.test.ts
+corepack pnpm --filter @stockwiki/web test -- tests/source-policy.test.ts tests/stock-page.test.tsx tests/edit-flow.test.ts tests/discussion-flow.test.ts tests/search-flow.test.ts tests/watchlist-flow.test.ts
 corepack pnpm --filter @stockwiki/web build
 corepack pnpm --filter @stockwiki/web exec playwright install chromium
 corepack pnpm --filter @stockwiki/web test:e2e
@@ -71,10 +71,12 @@ PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/fi
 PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers typecheck
 PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers test
 PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web typecheck
-PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/search-flow.test.ts tests/stock-page.test.tsx
+PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/stock-page.test.tsx tests/discussion-flow.test.ts tests/edit-flow.test.ts tests/watchlist-flow.test.ts
 PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test:e2e
 PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm check
 PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm build
+PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm validate:docs
+PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm lint:docs
 PATH="$HOME/.local/node-v24.13.1/bin:$PATH" ./scripts/hooks/post-edit-check.sh
 ./scripts/hooks/guard-secrets.sh
 docker compose -f infra/compose/docker-compose.yml config
@@ -88,14 +90,16 @@ docker compose -f infra/compose/docker-compose.yml config
 - `corepack pnpm --filter @stockwiki/workers typecheck` passed
 - `corepack pnpm --filter @stockwiki/workers test` passed
 - `corepack pnpm --filter @stockwiki/web typecheck` passed
-- `corepack pnpm --filter @stockwiki/web test -- tests/search-flow.test.ts tests/stock-page.test.tsx` passed
+- `corepack pnpm --filter @stockwiki/web test -- tests/stock-page.test.tsx tests/discussion-flow.test.ts tests/edit-flow.test.ts tests/watchlist-flow.test.ts` passed
 - `corepack pnpm --filter @stockwiki/web test:e2e` passed
 - `pnpm check` passed
 - `pnpm build` passed
+- `pnpm validate:docs` passed
+- `pnpm lint:docs` passed
 - `./scripts/hooks/post-edit-check.sh` passed
 - `./scripts/hooks/guard-secrets.sh` passed
 - `docker compose -f infra/compose/docker-compose.yml config` passed
-- Phase 6 search shell now exposes `/search`, `GET /api/public/search?q=`, alias-aware autocomplete, and search lag metrics from the shared fake-first indexing contract
+- Phase 7 watchlist shell now exposes stock page watchlist controls, `/me/watchlist`, in-app notification center, and digest preview wiring from the shared fake-first notification contract
 
 ## Start Commands
 

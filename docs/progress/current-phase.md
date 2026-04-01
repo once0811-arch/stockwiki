@@ -1,6 +1,6 @@
 # Current Phase
 
-- current phase: Phase 7 - watchlist / notifications
+- current phase: Phase 8 - real MediaWiki integration
 - completed:
   - Phase 0 repository bootstrap closed with passing workspace checks
   - Phase 1 read-only stock page MVP closed
@@ -9,6 +9,7 @@
   - Phase 4 citation and trust policy closed
   - Phase 5 discussion system closed
   - Phase 6 search shell closed
+  - Phase 7 watchlist and notification shell closed
   - `/stocks/[market]/[ticker]/discussion` now renders fixture-backed thread list, thread creation, comment/reply flows, helpful votes, comment reports, and reviewer pin/lock actions
   - discussion threads stay separated from approved wiki content while linking back to citation-aware article sections
   - stock pages now read discussion summary data from the live discussion read model instead of placeholder preview seeds
@@ -20,14 +21,18 @@
   - public stock search excludes visible noindex pages and keeps reviewed-content-first ranking ahead of discussion results
   - search autocomplete suggestions now reuse alias-aware fixture data and stock pages route directly into the live search shell
   - approved review, alias update, and discussion created events now feed a shared search indexing lag snapshot for web and workers
+  - stock pages now expose fake-first watchlist add/remove controls plus a notification center link without moving watch state into the wiki engine
+  - `/me/watchlist` now renders watched page cards, in-app notifications, and a digest email stub for member and reviewer demo sessions
+  - reviewer approval and discussion reply actions now fan out notification events to watched stock pages while excluding the acting user
+  - workers now expose a shared digest preview shell for unread notifications using the same `@stockwiki/domain` contract as web
 - in progress:
-  - scoping the first Phase 7 watchlist and notification slice
+  - scoping the first Phase 8 real MediaWiki integration slice
 - blockers:
   - none
 - next slice:
-  - add fake-first watchlist add/remove flow for signed-in member, contributor, and reviewer sessions
-  - expose notification center shell with approved revision and discussion reply events
-  - add digest email stub and notification worker skeleton
+  - wire docker-backed `MediaWikiEngine` read/render/history/diff calls against the official API boundary
+  - keep canonical page key to MediaWiki title mapping explicit so fake and real engines stay contract-compatible
+  - connect edit and recent changes sync flows to the real MediaWiki runtime without breaking approved-render stability
 - verification snapshot:
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" node -v` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm -v` passed
@@ -35,10 +40,12 @@
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers typecheck` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers test` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web typecheck` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/search-flow.test.ts tests/stock-page.test.tsx` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/stock-page.test.tsx tests/discussion-flow.test.ts tests/edit-flow.test.ts tests/watchlist-flow.test.ts` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test:e2e` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm check` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm build` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm validate:docs` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm lint:docs` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" ./scripts/hooks/post-edit-check.sh` passed
   - `./scripts/hooks/guard-secrets.sh` passed
   - `docker compose -f infra/compose/docker-compose.yml config` passed

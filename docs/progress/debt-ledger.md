@@ -14,6 +14,7 @@ Phase 0~3에서 남겼던 부채를 backlog보다 더 운영 친화적으로 추
 | D-005 | Phase 0 | local infra `docker compose up` 실제 기동 smoke 와 healthcheck 확인 | 2026-04-01 | `infra/compose/docker-compose.yml`, `docs/runbooks/local-dev.md` |
 | D-007 | Phase 5 | discussion preview read model 을 실제 discussion domain shape 로 치환 | 2026-04-01 | `apps/web/src/discussion/discussion-read-model.ts`, `apps/web/src/stock-page/get-stock-page-data.ts` |
 | D-015 | Harness | root-level validation scripts 를 lint/typecheck 표면에 포함 | 2026-04-01 | `package.json`, `tsconfig.scripts.json` |
+| D-021 | Phase 7 | stock page, review approve, discussion reply 를 하나의 notification center shell 로 연결 | 2026-04-01 | `apps/web/src/watchlist`, `apps/web/src/wiki-edit/review-workflow.ts`, `apps/web/src/discussion/discussion-actions.ts` |
 
 ## Remaining
 
@@ -32,6 +33,8 @@ Phase 0~3에서 남겼던 부채를 backlog보다 더 운영 친화적으로 추
 | D-018 | Phase 5 | discussion thread/comment/report store 를 persistent app DB adapter 로 치환 | Deferred by architecture | 현재 discussion state 는 process memory 와 seed fixtures 에만 존재한다 | app DB schema 와 discussion repository adapter 가 준비되는 slice 에서 replacement |
 | D-019 | Phase 5 | discussion report, pin/lock, audit trail 을 dedicated admin/mod queue 로 분리 | Deferred by scope | Phase 5 는 discussion page usable 과 basic moderation shell 을 닫는 데 집중했다 | moderation admin queue 와 audit persistence slice 에서 분리 |
 | D-020 | Phase 6 | fake-first search read model / lag snapshot 을 real OpenSearch adapter 와 persistent index 로 치환 | Deferred by architecture | 현재 search 는 fixture alias, in-memory discussion state, static indexing event stream 을 사용한다 | search infra / app DB schema 가 준비되는 slice 에서 adapter 치환 |
+| D-022 | Phase 7 | in-memory watchlist / notification store 를 persistent app DB adapter 와 outbox 로 치환 | Deferred by architecture | 현재 watcher state 와 notification center 는 process memory 에만 존재한다 | app DB schema, outbox, worker orchestration 이 준비되는 slice 에서 replacement |
+| D-023 | Phase 7 | digest stub, read state, preference surface 를 real delivery workflow 로 확장 | Deferred by product scope | Phase 7 은 in-app visibility 와 contract 고정에 집중했고 mailer/prefs/audit 까지는 열지 않았다 | notification delivery slice 에서 sender, prefs, audit trail 추가 |
 
 ## Notes
 

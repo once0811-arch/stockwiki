@@ -2,12 +2,18 @@
 
 상세 debt ledger: `docs/progress/debt-ledger.md`
 
-## Phase 7 Backlog
+## Phase 8 Backlog
 
-1. watchlist add/remove shell 과 fake session gating 을 추가
-2. notification center shell 을 만들고 watchlist / approved revision / discussion reply event 를 묶는다
-3. digest email stub 와 notification preference surface 를 추가
-4. approved revision notify 와 discussion reply notify worker skeleton 을 추가
+1. docker-backed `MediaWikiEngine` read/render/history/diff adapter 를 official API boundary 로 연결
+2. canonical page key 와 MediaWiki title mapping 을 명시하고 fake engine 계약과 drift 가 없는지 contract test 로 고정
+3. edit integration 과 recent changes poller 를 real MediaWiki runtime 에 연결하되 approved render stability 를 유지
+4. OIDC/SSO wiring shell 과 extension wiring 범위를 fake-first app phase 와 충돌하지 않게 잘라낸다
+
+## Deferred From Phase 7
+
+1. in-memory watchlist / notification store 를 persistent app DB adapter 와 outbox 로 치환
+2. notification read state, preference 저장, richer subscription granularity 를 real UX/API slice 로 확장
+3. digest email stub 를 real sender, retry policy, delivery audit trail 과 연결
 
 ## Deferred From Phase 6
 

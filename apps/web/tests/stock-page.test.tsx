@@ -2,10 +2,13 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { resetDiscussionStore } from "../src/discussion/discussion-store";
 import { buildStockMetadata } from "../src/stock-page/build-stock-metadata";
 import { getStockPageData } from "../src/stock-page/get-stock-page-data";
+import { submitWatchlistAdd } from "../src/watchlist/watchlist-actions";
+import { resetWatchlistStore } from "../src/watchlist/watchlist-store";
 
 describe("stock page read model", () => {
   beforeEach(() => {
     resetDiscussionStore();
+    resetWatchlistStore();
   });
 
   it("loads fixture-backed stock page data with approved wiki content", async () => {
@@ -47,6 +50,27 @@ describe("stock page read model", () => {
     );
 
     expect(data.discussionPath).toBe("/stocks/krx/005930/discussion?actor=member-1");
+  });
+
+  it("shows watchlist state and notification center context for signed-in members", async () => {
+    await submitWatchlistAdd({
+      actor: "member-1",
+      market: "krx",
+      ticker: "005930"
+    });
+
+    const data = await getStockPageData(
+      {
+        market: "krx",
+        ticker: "005930"
+      },
+      "member-1"
+    );
+
+    expect(data.stockPath).toBe("/stocks/krx/005930?actor=member-1");
+    expect(data.notificationCenterPath).toBe("/me/watchlist?actor=member-1");
+    expect(data.watchState.isWatching).toBe(true);
+    expect(data.watchState.unreadNotificationCount).toBe(1);
   });
 
   it("generates canonical metadata for the stock route", async () => {

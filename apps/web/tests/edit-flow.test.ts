@@ -3,12 +3,14 @@ import { getStockHistoryPageData } from "../src/stock-page/get-stock-history-pag
 import { getStockPageData } from "../src/stock-page/get-stock-page-data";
 import { approveStockEditProposal, getModQueuePageData, rejectStockEditProposal } from "../src/wiki-edit/review-workflow";
 import { getStockEditPageData } from "../src/wiki-edit/get-stock-edit-page-data";
+import { resetWatchlistStore } from "../src/watchlist/watchlist-store";
 import { listReputationEvents, resetPendingEditStore } from "../src/wiki-edit/pending-edit-store";
 import { submitStockEditIntent } from "../src/wiki-edit/submit-stock-edit-intent";
 
 describe("phase 4 citation-aware edit proposal flow", () => {
   beforeEach(() => {
     resetPendingEditStore();
+    resetWatchlistStore();
   });
 
   it("gates edit entry by fake session role", async () => {

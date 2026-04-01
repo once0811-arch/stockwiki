@@ -15,6 +15,7 @@ import {
 } from "../discussion/discussion-read-model";
 import type { DiscussionPreviewItem } from "../discussion/types";
 import { searchPlaceholderText } from "../search/search-read-model";
+import { getStockWatchState, type StockWatchState } from "../watchlist/watchlist-read-model";
 import type { StockPageState } from "./stock-page-seeds";
 import {
   getStockWikiSnapshot,
@@ -34,6 +35,7 @@ export interface StockPageData {
   filings: Filing[];
   indexable: boolean;
   latestSources: RevisionSourcesSnapshot;
+  notificationCenterPath: string;
   pageState: StockPageState;
   pageStateLabel: string;
   pageStateSummary: string;
@@ -41,7 +43,9 @@ export interface StockPageData {
   quote: Quote;
   revisionSummary: StockRevisionSummary;
   searchPlaceholder: string;
+  stockPath: string;
   sourceTierGuidance: SourceTierDefinition[];
+  watchState: StockWatchState;
   wiki: RenderedPage;
 }
 
@@ -58,6 +62,11 @@ export async function getStockPageData(input: StockKey, actor?: string): Promise
     profile
   });
   const discussionData = await getStockDiscussionPreviewData(key, actor);
+  const watchState = await getStockWatchState({
+    actor,
+    market: key.market,
+    ticker: key.ticker
+  });
 
   return {
     approvedSources: snapshot.approvedSources,
@@ -71,6 +80,7 @@ export async function getStockPageData(input: StockKey, actor?: string): Promise
     filings,
     indexable: snapshot.seed.indexable && snapshot.wiki.reviewed,
     latestSources: snapshot.latestSources,
+    notificationCenterPath: watchState.notificationCenterPath,
     pageState: snapshot.seed.pageState,
     pageStateLabel: snapshot.seed.pageStateLabel,
     pageStateSummary: snapshot.seed.pageStateSummary,
@@ -78,7 +88,9 @@ export async function getStockPageData(input: StockKey, actor?: string): Promise
     quote,
     revisionSummary: snapshot.revisionSummary,
     searchPlaceholder: searchPlaceholderText,
+    stockPath: buildStockPath(key, actor),
     sourceTierGuidance: sourceTierDefinitions,
+    watchState,
     wiki: snapshot.wiki
   };
 }
@@ -98,4 +110,14 @@ function normalizeStockKey(input: StockKey): StockKey {
     market: input.market.toUpperCase(),
     ticker: input.ticker.toUpperCase()
   };
+}
+
+function buildStockPath(key: StockKey, actor?: string): string {
+  const basePath = `/stocks/${key.market.toLowerCase()}/${key.ticker}`;
+
+  if (!actor) {
+    return basePath;
+  }
+
+  return `${basePath}?actor=${encodeURIComponent(actor)}`;
 }

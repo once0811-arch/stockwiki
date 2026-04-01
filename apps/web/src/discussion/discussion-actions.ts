@@ -1,6 +1,7 @@
 import { FixtureMarketDataProvider } from "@stockwiki/fixtures";
 import type { StockKey } from "@stockwiki/domain";
 import { getStockWikiSnapshot } from "../stock-page/get-stock-wiki-snapshot";
+import { notifyWatchersOfDiscussionReply } from "../watchlist/watchlist-actions";
 import { getFakeSession, hasFakeRole } from "../wiki-edit/fake-session";
 import {
   addDiscussionComment,
@@ -96,6 +97,14 @@ export async function submitDiscussionComment(input: {
     bodyMarkdown,
     parentCommentId: input.parentCommentId,
     threadId: input.threadId
+  });
+  notifyWatchersOfDiscussionReply({
+    actorId: session.userId,
+    commentId: comment.id,
+    pageKey,
+    pageTitle: profile.name,
+    summary: `${profile.name} discussion received a new reply.`,
+    threadId: comment.threadId
   });
 
   return {

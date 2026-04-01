@@ -11,6 +11,8 @@ interface StockPageRouteProps {
   }>;
   searchParams: Promise<{
     actor?: string | string[];
+    error?: string | string[];
+    notice?: string | string[];
   }>;
 }
 
@@ -38,10 +40,12 @@ export default async function StockPage(props: StockPageRouteProps) {
   const params = await props.params;
   const searchParams = await props.searchParams;
   const actor = Array.isArray(searchParams.actor) ? searchParams.actor[0] : searchParams.actor;
+  const notice = Array.isArray(searchParams.notice) ? searchParams.notice[0] : searchParams.notice;
+  const error = Array.isArray(searchParams.error) ? searchParams.error[0] : searchParams.error;
 
   try {
     const data = await getStockPageData(params, actor);
-    return <StockPageView data={data} />;
+    return <StockPageView data={data} error={error} notice={notice} />;
   } catch {
     notFound();
   }

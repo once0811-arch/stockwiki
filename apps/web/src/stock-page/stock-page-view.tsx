@@ -12,8 +12,12 @@ function formatPercent(value: number): string {
   return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
 }
 
-export function StockPageView(props: { data: StockPageData }) {
-  const { data } = props;
+export function StockPageView(props: {
+  data: StockPageData;
+  error?: string;
+  notice?: string;
+}) {
+  const { data, error, notice } = props;
   const preferredTierLabels = data.sourceTierGuidance.map((tier) => tier.label).join(" -> ");
 
   return (
@@ -26,62 +30,105 @@ export function StockPageView(props: { data: StockPageData }) {
         gap: "1.5rem"
       }}
     >
-      <PhaseBadge>Phase 6 Search Slice</PhaseBadge>
+      <PhaseBadge>Phase 7 Watchlist Slice</PhaseBadge>
 
-      <header
-        style={{
-          display: "grid",
-          gap: "0.75rem",
-          padding: "2rem",
-          borderRadius: "1.5rem",
-          background: "linear-gradient(135deg, #e2e8f0 0%, #f8fafc 100%)"
-        }}
-      >
-        <p style={{ margin: 0, fontSize: "0.9rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+      <header style={heroStyle}>
+        <p style={eyebrowStyle}>
           {data.profile.market} / {data.profile.ticker}
         </p>
-        <h1 style={{ margin: 0, fontSize: "3rem", lineHeight: 1 }}>{data.profile.name}</h1>
-        <p style={{ margin: 0, maxWidth: "46rem", lineHeight: 1.7 }}>{data.profile.summary}</p>
-        <div style={{ display: "grid", gap: "0.5rem", maxWidth: "40rem" }}>
+        <h1 style={titleStyle}>{data.profile.name}</h1>
+        <p style={descriptionStyle}>{data.profile.summary}</p>
+
+        <div style={{ display: "grid", gap: "0.5rem", maxWidth: "42rem" }}>
           <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", flexWrap: "wrap" }}>
             <span role="status" style={statusBadgeStyles[data.pageState]}>
               {data.pageStateLabel}
             </span>
             <span style={{ color: "#334155", fontSize: "0.95rem" }}>{data.pageStateSummary}</span>
           </div>
-	          <div style={{ display: "grid", gap: "0.35rem" }}>
-	            <span style={{ color: "#0f172a", fontWeight: 600 }}>
-	              Public page pinned to approved revision {data.revisionSummary.approvedRevisionId}
-	            </span>
-	            <span style={{ color: "#475569", fontSize: "0.95rem" }}>
+          <div style={{ display: "grid", gap: "0.35rem" }}>
+            <span style={{ color: "#0f172a", fontWeight: 600 }}>
+              Public page pinned to approved revision {data.revisionSummary.approvedRevisionId}
+            </span>
+            <span style={{ color: "#475569", fontSize: "0.95rem" }}>
               Latest revision {data.revisionSummary.latestRevisionId} is {data.revisionSummary.latestRevisionStatus}.
               {` ${data.revisionSummary.pendingRevisionCount} pending revision${data.revisionSummary.pendingRevisionCount === 1 ? "" : "s"} waiting for review.`}
-	            </span>
-	            <span style={{ color: "#475569", fontSize: "0.95rem" }}>
-	              Approved revision carries {data.approvedSources.policy.citationCount} citation
-	              {data.approvedSources.policy.citationCount === 1 ? "" : "s"}.
-	              {` Preferred source ladder: ${preferredTierLabels}.`}
-	            </span>
-	            {data.latestSources.policy.status !== "clear" ? (
-	              <span style={{ color: "#92400e", fontSize: "0.95rem" }}>
-	                Latest revision is waiting with a {data.latestSources.policy.status} source-policy review state.
-	              </span>
-	            ) : null}
-	            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-	              <Link href={data.editPath} style={linkStyle}>
-	                Edit This Page
-              </Link>
-              <Link href={data.revisionSummary.historyPath} style={linkStyle}>
-                View Revision History
-              </Link>
-              {data.revisionSummary.latestDiffPath ? (
-                <Link href={data.revisionSummary.latestDiffPath} style={linkStyle}>
-                  Compare Approved vs Latest
-                </Link>
-              ) : null}
-            </div>
+            </span>
+            <span style={{ color: "#475569", fontSize: "0.95rem" }}>
+              Approved revision carries {data.approvedSources.policy.citationCount} citation
+              {data.approvedSources.policy.citationCount === 1 ? "" : "s"}.
+              {` Preferred source ladder: ${preferredTierLabels}.`}
+            </span>
+            {data.latestSources.policy.status !== "clear" ? (
+              <span style={{ color: "#92400e", fontSize: "0.95rem" }}>
+                Latest revision is waiting with a {data.latestSources.policy.status} source-policy review state.
+              </span>
+            ) : null}
           </div>
         </div>
+
+        {notice ? <p style={successPanelStyle}>{resolveNotice(notice)}</p> : null}
+        {error ? <p style={errorPanelStyle}>{decodeURIComponent(error)}</p> : null}
+
+        <section style={watchPanelStyle}>
+          <div style={{ display: "grid", gap: "0.35rem" }}>
+            <strong style={{ fontSize: "1rem" }}>Watchlist</strong>
+            <span style={{ color: "#475569", lineHeight: 1.7 }}>{data.watchState.access.message}</span>
+            <span style={{ color: "#475569" }}>
+              Notification center has {data.watchState.unreadNotificationCount} unread item
+              {data.watchState.unreadNotificationCount === 1 ? "" : "s"}.
+            </span>
+          </div>
+
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", alignItems: "center" }}>
+            {data.watchState.access.canManage ? (
+              data.watchState.isWatching && data.watchState.watchId ? (
+                <>
+                  <span style={watchingBadgeStyle}>Watching</span>
+                  <form action={`/api/watchlist/${data.watchState.watchId}`} method="post">
+                    <input type="hidden" name="actor" value={readActorFromPath(data.stockPath) ?? ""} />
+                    <input type="hidden" name="returnTo" value={data.stockPath} />
+                    <button type="submit" style={secondaryButtonStyle}>
+                      Remove Watch
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <form action="/api/watchlist" method="post">
+                  <input type="hidden" name="actor" value={readActorFromPath(data.stockPath) ?? ""} />
+                  <input type="hidden" name="market" value={data.profile.market} />
+                  <input type="hidden" name="ticker" value={data.profile.ticker} />
+                  <button type="submit" style={primaryButtonStyle}>
+                    Add To Watchlist
+                  </button>
+                </form>
+              )
+            ) : (
+              <Link href={`/login?returnTo=${encodeURIComponent(data.stockPath)}`} style={linkStyle}>
+                Continue To Demo Login
+              </Link>
+            )}
+
+            <Link href={data.notificationCenterPath} style={linkStyle}>
+              Notification Center
+            </Link>
+          </div>
+        </section>
+
+        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+          <Link href={data.editPath} style={linkStyle}>
+            Edit This Page
+          </Link>
+          <Link href={data.revisionSummary.historyPath} style={linkStyle}>
+            View Revision History
+          </Link>
+          {data.revisionSummary.latestDiffPath ? (
+            <Link href={data.revisionSummary.latestDiffPath} style={linkStyle}>
+              Compare Approved vs Latest
+            </Link>
+          ) : null}
+        </div>
+
         <form action="/search" method="get" style={{ display: "grid", gap: "0.5rem", maxWidth: "32rem" }}>
           <label htmlFor="stock-page-search" style={{ fontWeight: 600 }}>
             Search StockWiki
@@ -91,39 +138,16 @@ export function StockPageView(props: { data: StockPageData }) {
               id="stock-page-search"
               name="q"
               placeholder={data.searchPlaceholder}
-              style={{
-                flex: "1 1 18rem",
-                border: "1px solid #cbd5e1",
-                borderRadius: "999px",
-                padding: "0.85rem 1rem",
-                backgroundColor: "#fff"
-              }}
+              style={searchInputStyle}
             />
-            <button
-              type="submit"
-              style={{
-                border: 0,
-                borderRadius: "999px",
-                padding: "0.85rem 1.1rem",
-                background: "#0f172a",
-                color: "#f8fafc",
-                fontWeight: 700,
-                cursor: "pointer"
-              }}
-            >
+            <button type="submit" style={primaryButtonStyle}>
               Search
             </button>
           </div>
         </form>
       </header>
 
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "1rem"
-        }}
-      >
+      <section style={cardGridStyle}>
         <article style={cardStyle}>
           <h2 style={headingStyle}>System Data</h2>
           <dl style={dlStyle}>
@@ -152,19 +176,13 @@ export function StockPageView(props: { data: StockPageData }) {
           </dl>
         </article>
 
-	        <article style={cardStyle}>
-	          <h2 style={headingStyle}>Approved Wiki</h2>
-	          <div dangerouslySetInnerHTML={{ __html: data.wiki.html }} style={{ lineHeight: 1.7 }} />
-	        </article>
-	      </section>
+        <article style={cardStyle}>
+          <h2 style={headingStyle}>Approved Wiki</h2>
+          <div dangerouslySetInnerHTML={{ __html: data.wiki.html }} style={{ lineHeight: 1.7 }} />
+        </article>
+      </section>
 
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "1rem"
-        }}
-      >
+      <section style={cardGridStyle}>
         <article style={cardStyle}>
           <h2 style={headingStyle}>Discussion Preview</h2>
           <p style={{ margin: 0, color: "#475569" }}>
@@ -172,7 +190,7 @@ export function StockPageView(props: { data: StockPageData }) {
             {data.discussionSummary.reportedCommentCount === 1 ? "" : "s"} / {data.discussionSummary.threadCount} total thread
             {data.discussionSummary.threadCount === 1 ? "" : "s"}
           </p>
-          <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
+          <ul style={listStyle}>
             {data.discussionPreview.map((item) => (
               <li key={item.id}>
                 <strong>{item.title}</strong>
@@ -191,7 +209,7 @@ export function StockPageView(props: { data: StockPageData }) {
 
         <article style={cardStyle}>
           <h2 style={headingStyle}>Recent Filings</h2>
-          <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
+          <ul style={listStyle}>
             {data.filings.map((item) => (
               <li key={item.id}>
                 <strong>{item.title}</strong>
@@ -201,74 +219,90 @@ export function StockPageView(props: { data: StockPageData }) {
           </ul>
         </article>
 
-	        <article style={cardStyle}>
-	          <h2 style={headingStyle}>Corporate Actions</h2>
-	          <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
-	            {data.corporateActions.map((item) => (
+        <article style={cardStyle}>
+          <h2 style={headingStyle}>Corporate Actions</h2>
+          <ul style={listStyle}>
+            {data.corporateActions.map((item) => (
               <li key={item.id}>
                 <strong>{item.actionType}</strong>
                 <div>{item.summary}</div>
               </li>
-	            ))}
-	          </ul>
-	        </article>
+            ))}
+          </ul>
+        </article>
 
-	        <article style={cardStyle}>
-	          <h2 style={headingStyle}>Trust & Sources</h2>
-	          <p style={{ margin: 0, lineHeight: 1.7 }}>
-	            Citation-required sections stay visible even while public readers remain pinned to the approved revision.
-	          </p>
-	          <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
-	            {data.citationSections.map((section) => (
-	              <li key={section.id}>
-	                <strong>{section.label}</strong>
-	                <div>{section.description}</div>
-	                <div>
-	                  {section.citationRequired ? "Citation required" : "Citation optional"}
-	                  {section.contentious ? " / High-risk review" : ""}
-	                </div>
-	              </li>
-	            ))}
-	          </ul>
-	          {data.approvedSources.policy.findings.length > 0 ? (
-	            <div style={warningPanelStyle}>
-	              <strong>Approved revision warnings</strong>
-	              <ul style={warningListStyle}>
-	                {data.approvedSources.policy.findings.map((finding) => (
-	                  <li key={`${finding.code}-${finding.sectionId ?? "general"}`}>{finding.message}</li>
-	                ))}
-	              </ul>
-	            </div>
-	          ) : (
-	            <div style={successPanelStyle}>Approved revision currently satisfies the fake-first source policy checks.</div>
-	          )}
-	        </article>
+        <article style={cardStyle}>
+          <h2 style={headingStyle}>Trust & Sources</h2>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Citation-required sections stay visible even while public readers remain pinned to the approved revision.
+          </p>
+          <ul style={listStyle}>
+            {data.citationSections.map((section) => (
+              <li key={section.id}>
+                <strong>{section.label}</strong>
+                <div>{section.description}</div>
+                <div>
+                  {section.citationRequired ? "Citation required" : "Citation optional"}
+                  {section.contentious ? " / High-risk review" : ""}
+                </div>
+              </li>
+            ))}
+          </ul>
+          {data.approvedSources.policy.findings.length > 0 ? (
+            <div style={warningPanelStyle}>
+              <strong>Approved revision warnings</strong>
+              <ul style={warningListStyle}>
+                {data.approvedSources.policy.findings.map((finding) => (
+                  <li key={`${finding.code}-${finding.sectionId ?? "general"}`}>{finding.message}</li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div style={successInlineStyle}>Approved revision currently satisfies the fake-first source policy checks.</div>
+          )}
+        </article>
 
-	        <article style={cardStyle}>
-	          <h2 style={headingStyle}>References</h2>
-	          {data.approvedSources.citations.length === 0 ? (
-	            <p style={{ margin: 0 }}>No citations are attached to the approved revision yet.</p>
-	          ) : (
-	            <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
-	              {data.approvedSources.citations.map((citation) => (
-	                <li key={citation.id}>
-	                  <strong>{citation.label}</strong>
-	                  <div>{formatSectionLabel(data, citation.sectionId)}</div>
-	                  <div>
-	                    {formatTierLabel(data, citation.sourceTier)}
-	                    {citation.publishedAt ? ` / ${citation.publishedAt}` : ""}
-	                  </div>
-	                  <a href={citation.sourceUrl} style={linkStyle}>
-	                    {citation.sourceUrl}
-	                  </a>
-	                </li>
-	              ))}
-	            </ul>
-	          )}
-	        </article>
-	      </section>
-	    </main>
+        <article style={cardStyle}>
+          <h2 style={headingStyle}>References</h2>
+          {data.approvedSources.citations.length === 0 ? (
+            <p style={{ margin: 0 }}>No citations are attached to the approved revision yet.</p>
+          ) : (
+            <ul style={listStyle}>
+              {data.approvedSources.citations.map((citation) => (
+                <li key={citation.id}>
+                  <strong>{citation.label}</strong>
+                  <div>{formatSectionLabel(data, citation.sectionId)}</div>
+                  <div>
+                    {formatTierLabel(data, citation.sourceTier)}
+                    {citation.publishedAt ? ` / ${citation.publishedAt}` : ""}
+                  </div>
+                  <a href={citation.sourceUrl} style={linkStyle}>
+                    {citation.sourceUrl}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+      </section>
+    </main>
   );
+}
+
+function resolveNotice(notice: string): string {
+  switch (notice) {
+    case "watch_added":
+      return "Watchlist entry saved.";
+    case "watch_removed":
+      return "Watchlist entry removed.";
+    default:
+      return notice;
+  }
+}
+
+function readActorFromPath(path: string): string | undefined {
+  const match = path.match(/[?&]actor=([^&]+)/);
+  return match?.[1] ? decodeURIComponent(match[1]) : undefined;
 }
 
 function formatSectionLabel(data: StockPageData, sectionId: string): string {
@@ -279,7 +313,42 @@ function formatTierLabel(data: StockPageData, tier: string): string {
   return data.sourceTierGuidance.find((item) => item.tier === tier)?.label ?? tier;
 }
 
+const heroStyle = {
+  display: "grid",
+  gap: "0.9rem",
+  padding: "2rem",
+  borderRadius: "1.5rem",
+  background: "linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%)"
+} as const;
+
+const eyebrowStyle = {
+  margin: 0,
+  fontSize: "0.9rem",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase"
+} as const;
+
+const titleStyle = {
+  margin: 0,
+  fontSize: "3rem",
+  lineHeight: 1
+} as const;
+
+const descriptionStyle = {
+  margin: 0,
+  maxWidth: "46rem",
+  lineHeight: 1.7
+} as const;
+
+const cardGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+  gap: "1rem"
+} as const;
+
 const cardStyle = {
+  display: "grid",
+  gap: "1rem",
   padding: "1.5rem",
   borderRadius: "1.25rem",
   border: "1px solid #cbd5e1",
@@ -289,7 +358,7 @@ const cardStyle = {
 
 const headingStyle = {
   marginTop: 0,
-  marginBottom: "1rem",
+  marginBottom: 0,
   fontSize: "1.25rem"
 } as const;
 
@@ -327,13 +396,64 @@ const dlStyle = {
   gap: "0.85rem"
 } as const;
 
+const listStyle = {
+  margin: 0,
+  paddingLeft: "1.1rem",
+  display: "grid",
+  gap: "0.85rem"
+} as const;
+
 const linkStyle = {
   color: "#0f172a",
   fontWeight: 700,
   textDecoration: "underline"
 } as const;
 
+const primaryButtonStyle = {
+  border: 0,
+  borderRadius: "999px",
+  padding: "0.85rem 1.1rem",
+  background: "#0f172a",
+  color: "#f8fafc",
+  fontWeight: 700,
+  cursor: "pointer"
+} as const;
+
+const secondaryButtonStyle = {
+  border: "1px solid #0f172a",
+  borderRadius: "999px",
+  padding: "0.85rem 1.1rem",
+  background: "#fff",
+  color: "#0f172a",
+  fontWeight: 700,
+  cursor: "pointer"
+} as const;
+
+const searchInputStyle = {
+  flex: "1 1 18rem",
+  border: "1px solid #cbd5e1",
+  borderRadius: "999px",
+  padding: "0.85rem 1rem",
+  backgroundColor: "#fff"
+} as const;
+
 const successPanelStyle = {
+  margin: 0,
+  padding: "0.9rem 1rem",
+  borderRadius: "1rem",
+  backgroundColor: "#dcfce7",
+  color: "#166534"
+} as const;
+
+const errorPanelStyle = {
+  margin: 0,
+  padding: "0.9rem 1rem",
+  borderRadius: "1rem",
+  backgroundColor: "#fee2e2",
+  color: "#991b1b"
+} as const;
+
+const successInlineStyle = {
   padding: "1rem",
   borderRadius: "0.85rem",
   backgroundColor: "#dcfce7",
@@ -354,4 +474,27 @@ const warningListStyle = {
   paddingLeft: "1.1rem",
   display: "grid",
   gap: "0.5rem"
+} as const;
+
+const watchPanelStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "1rem",
+  flexWrap: "wrap",
+  alignItems: "center",
+  padding: "1rem 1.1rem",
+  borderRadius: "1rem",
+  background: "rgba(255, 255, 255, 0.85)",
+  border: "1px solid #bfdbfe"
+} as const;
+
+const watchingBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "0.35rem 0.7rem",
+  borderRadius: "999px",
+  fontSize: "0.8rem",
+  fontWeight: 700,
+  backgroundColor: "#dcfce7",
+  color: "#166534"
 } as const;

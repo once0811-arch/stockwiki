@@ -330,6 +330,102 @@ export function buildSearchIndexSyncResult(input: {
   };
 }
 
+export type WatchTargetType = "stock_page";
+export type NotificationType = "watch_started" | "revision_approved" | "discussion_reply";
+
+export interface WatchlistEntry {
+  createdAt: string;
+  id: string;
+  targetId: string;
+  targetType: WatchTargetType;
+  userId: string;
+}
+
+export interface NotificationPayload {
+  actorId?: string;
+  commentId?: string;
+  pageKey: PageKey;
+  pageTitle: string;
+  revisionId?: string;
+  summary: string;
+  threadId?: string;
+}
+
+export interface NotificationRecord {
+  createdAt: string;
+  id: string;
+  payload: NotificationPayload;
+  readAt: string | null;
+  type: NotificationType;
+  userId: string;
+}
+
+export interface NotificationDigestItem {
+  createdAt: string;
+  notificationId: string;
+  pageKey: PageKey;
+  summary: string;
+  type: NotificationType;
+}
+
+export interface NotificationDigestPreview {
+  itemCount: number;
+  items: NotificationDigestItem[];
+  latestCreatedAt: string | null;
+  subject: string;
+  userId: string;
+}
+
+export interface NotificationDigestResult {
+  digests: NotificationDigestPreview[];
+  generatedAt: string;
+  notificationCount: number;
+  recipientCount: number;
+}
+
+export function buildNotificationDigestResult(input: {
+  generatedAt: string;
+  notifications: NotificationRecord[];
+}): NotificationDigestResult {
+  const notificationsByUser = new Map<string, NotificationRecord[]>();
+
+  for (const notification of input.notifications) {
+    const items = notificationsByUser.get(notification.userId) ?? [];
+    items.push(notification);
+    notificationsByUser.set(notification.userId, items);
+  }
+
+  const digests = [...notificationsByUser.entries()]
+    .sort(([leftUserId], [rightUserId]) => leftUserId.localeCompare(rightUserId))
+    .map<NotificationDigestPreview>(([userId, notifications]) => {
+      const sortedNotifications = [...notifications].sort((left, right) =>
+        right.createdAt.localeCompare(left.createdAt)
+      );
+      const items = sortedNotifications.map<NotificationDigestItem>((notification) => ({
+        createdAt: notification.createdAt,
+        notificationId: notification.id,
+        pageKey: notification.payload.pageKey,
+        summary: notification.payload.summary,
+        type: notification.type
+      }));
+
+      return {
+        itemCount: items.length,
+        items,
+        latestCreatedAt: items[0]?.createdAt ?? null,
+        subject: `StockWiki digest: ${items.length} pending update${items.length === 1 ? "" : "s"}`,
+        userId
+      };
+    });
+
+  return {
+    digests,
+    generatedAt: input.generatedAt,
+    notificationCount: input.notifications.length,
+    recipientCount: digests.length
+  };
+}
+
 export interface Filing {
   id: string;
   title: string;
