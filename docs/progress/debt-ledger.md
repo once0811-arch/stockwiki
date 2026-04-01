@@ -11,6 +11,7 @@ Phase 0~3에서 남겼던 부채를 backlog보다 더 운영 친화적으로 추
 | D-002 | Phase 0 | markdown lint 와 docs validation command 추가 | 2026-04-01 | `.markdownlint-cli2.jsonc`, `scripts/validate-docs.ts` |
 | D-003 | Phase 0 | placeholder hook 를 package-scoped lint/doc checks 와 secret guard 로 교체 | 2026-04-01 | `scripts/hooks/post-edit-check.sh`, `scripts/hooks/guard-secrets.sh` |
 | D-004 | Harness | `.claude/settings.json` phase drift 수정 | 2026-04-01 | `.claude/settings.json` |
+| D-005 | Phase 0 | local infra `docker compose up` 실제 기동 smoke 와 healthcheck 확인 | 2026-04-01 | `infra/compose/docker-compose.yml`, `docs/runbooks/local-dev.md` |
 | D-007 | Phase 5 | discussion preview read model 을 실제 discussion domain shape 로 치환 | 2026-04-01 | `apps/web/src/discussion/discussion-read-model.ts`, `apps/web/src/stock-page/get-stock-page-data.ts` |
 | D-015 | Harness | root-level validation scripts 를 lint/typecheck 표면에 포함 | 2026-04-01 | `package.json`, `tsconfig.scripts.json` |
 
@@ -18,7 +19,6 @@ Phase 0~3에서 남겼던 부채를 backlog보다 더 운영 친화적으로 추
 
 | ID | Phase | Item | Status | Why It Remains | Best Next Slice |
 | --- | --- | --- | --- | --- | --- |
-| D-005 | Phase 0 | local infra `docker compose up` 실제 기동 smoke 와 healthcheck 확인 | Blocked by environment | 현재 세션은 Docker daemon 이 떠 있지 않아 실제 기동 검증을 완료할 수 없다 | daemon 이 준비된 세션에서 compose up/down smoke 와 health endpoint 확인 |
 | D-006 | Phase 0 | MediaWiki extension profiles 세분화 | Deferred by roadmap | 실제 MediaWiki 통합 전에는 어떤 extension profile 이 필요한지 고정하기 이르다 | Phase 8 MediaWiki 통합 시작 시 profile matrix 정의 |
 | D-008 | Phase 2 | public history/diff read API endpoints 분리 | Deferred by scope | UI slice 와 fake-first contract 는 있으나 public API 경계는 아직 별도 가치가 낮다 | history/diff API consumer 가 생길 때 API slice 로 분리 |
 | D-009 | Phase 2 | in-memory shadow store 를 persistent app DB adapter 로 치환 | Deferred by architecture | app DB schema/migration/outbox 설계 없이 고정하면 재작업 가능성이 높다 | app DB schema 가 잡히는 시점에 persistence adapter 추가 |

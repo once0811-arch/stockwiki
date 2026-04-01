@@ -14,6 +14,7 @@
   - stock page discussion links preserve fake session context so member and reviewer navigation stays on the same flow
   - discussion moderation summary exposes reported comments, locked threads, and resolved thread counts without changing approved article render rules
   - discussion actions now reject thread/comment ids that do not belong to the current stock page
+  - local Docker runtime is now available via Colima and the full infra compose stack boots successfully after fixing the Temporal auto-setup driver
 - in progress:
   - scoping the first Phase 6 search indexing slice
 - blockers:
@@ -26,6 +27,14 @@
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" node -v` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm -v` passed
   - `docker compose -f infra/compose/docker-compose.yml config` passed
+  - `docker compose -f infra/compose/docker-compose.yml up -d` passed
+  - `docker compose -f infra/compose/docker-compose.yml ps -a` passed
+  - `docker exec compose-postgres-1 pg_isready -U stockwiki` passed
+  - `docker exec compose-redis-1 redis-cli ping` passed
+  - `curl -fsS http://localhost:9200` passed
+  - `curl -fsS http://localhost:8081 >/dev/null && echo mediawiki-ok` passed
+  - `curl -fsS http://localhost:8233 >/dev/null && echo temporal-ui-ok` passed
+  - `docker compose -f infra/compose/docker-compose.yml down` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web typecheck` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/stock-page.test.tsx tests/discussion-flow.test.ts` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test:e2e` passed
