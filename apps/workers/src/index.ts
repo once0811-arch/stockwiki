@@ -1,7 +1,12 @@
-import { FixtureMarketDataProvider } from "@stockwiki/fixtures";
+import {
+  FixtureMarketDataProvider,
+  searchIndexEventFixtures,
+  searchIndexFixtureCheckpoint
+} from "@stockwiki/fixtures";
 import { FakeWikiEngine } from "@stockwiki/wiki-bridge";
 import { InMemoryWikiShadowStore } from "@stockwiki/wiki-bridge/shadow-store";
 import { scanCitationLinks } from "./citation-dead-link-scan.js";
+import { syncSearchIndex } from "./search-index-sync.js";
 import { syncRecentChangesToShadowStore } from "./wiki-recent-changes-sync.js";
 
 async function main(): Promise<void> {
@@ -23,6 +28,10 @@ async function main(): Promise<void> {
     engine: wikiEngine,
     store: shadowStore
   });
+  const searchSync = syncSearchIndex({
+    events: searchIndexEventFixtures,
+    indexedThrough: searchIndexFixtureCheckpoint.indexedThrough
+  });
   const deadLinkScan = await scanCitationLinks({
     checkedAt: "2026-04-01T00:00:00.000Z",
     citations: [
@@ -41,9 +50,11 @@ async function main(): Promise<void> {
   });
 
   console.log("StockWiki worker bootstrap", {
-    phase: 4,
+    phase: 6,
     deadLinks: deadLinkScan.deadCount,
     linkChecks: deadLinkScan.checkedCount,
+    searchLagMinutes: searchSync.lag.lagMinutes,
+    searchPendingEvents: searchSync.lag.pendingEventCount,
     sampleTicker: quote.ticker,
     syncedPages: syncResult.pageCount,
     syncedRevisions: syncResult.revisionCount

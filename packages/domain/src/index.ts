@@ -255,6 +255,7 @@ export interface Quote {
 }
 
 export interface CompanyProfile {
+  aliases: string[];
   market: string;
   ticker: string;
   name: string;
@@ -262,6 +263,71 @@ export interface CompanyProfile {
   sector: string;
   industry: string;
   canonicalPageKey: PageKey;
+}
+
+export type SearchIndexEventKind = "alias_updated" | "approved_review" | "discussion_created";
+export type SearchIndexLagStatus = "fresh" | "lagging";
+
+export interface SearchIndexEvent {
+  id: string;
+  kind: SearchIndexEventKind;
+  occurredAt: string;
+  pageKey: PageKey;
+}
+
+export interface SearchIndexLagSnapshot {
+  indexedThrough: string;
+  lagMinutes: number;
+  lastEventAt: string | null;
+  pendingEventCount: number;
+  status: SearchIndexLagStatus;
+}
+
+export interface SearchIndexSyncResult {
+  handledEventCount: number;
+  handledEventKinds: SearchIndexEventKind[];
+  indexedPageCount: number;
+  lag: SearchIndexLagSnapshot;
+}
+
+export function buildSearchIndexLagSnapshot(input: {
+  events: SearchIndexEvent[];
+  indexedThrough: string;
+}): SearchIndexLagSnapshot {
+  const { events, indexedThrough } = input;
+  const sortedEvents = [...events].sort((left, right) => left.occurredAt.localeCompare(right.occurredAt));
+  const lastEventAt = sortedEvents.at(-1)?.occurredAt ?? null;
+  const pendingEvents = sortedEvents.filter((event) => event.occurredAt > indexedThrough);
+  const lagMinutes =
+    pendingEvents.length === 0 || !lastEventAt
+      ? 0
+      : Math.max(
+          0,
+          Math.round((Date.parse(lastEventAt) - Date.parse(indexedThrough)) / (1000 * 60))
+        );
+
+  return {
+    indexedThrough,
+    lagMinutes,
+    lastEventAt,
+    pendingEventCount: pendingEvents.length,
+    status: pendingEvents.length > 0 ? "lagging" : "fresh"
+  };
+}
+
+export function buildSearchIndexSyncResult(input: {
+  events: SearchIndexEvent[];
+  indexedThrough: string;
+}): SearchIndexSyncResult {
+  const handledEventKinds = [...new Set(input.events.map((event) => event.kind))];
+  const indexedPageCount = new Set(input.events.map((event) => event.pageKey)).size;
+
+  return {
+    handledEventCount: input.events.length,
+    handledEventKinds,
+    indexedPageCount,
+    lag: buildSearchIndexLagSnapshot(input)
+  };
 }
 
 export interface Filing {

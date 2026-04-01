@@ -30,7 +30,7 @@ describe("stock page read model", () => {
       ticker: "005930"
     });
 
-    expect(data.searchPlaceholder).toContain("Search placeholder");
+    expect(data.searchPlaceholder).toContain("Search by ticker");
     expect(data.discussionPath).toBe("/stocks/krx/005930/discussion");
     expect(data.discussionSummary.threadCount).toBeGreaterThan(0);
     expect(data.discussionPreview).toHaveLength(2);

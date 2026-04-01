@@ -5,6 +5,7 @@ import type {
   Filing,
   MarketDataProvider,
   Quote,
+  SearchIndexEvent,
   StockKey
 } from "@stockwiki/domain";
 
@@ -55,6 +56,7 @@ const quotes: Record<string, Quote> = {
 
 const profiles: Record<string, CompanyProfile> = {
   [SAMSUNG_ELECTRONICS]: {
+    aliases: ["SEC", "Samsung Elec"],
     market: "KRX",
     ticker: "005930",
     name: "Samsung Electronics",
@@ -64,6 +66,7 @@ const profiles: Record<string, CompanyProfile> = {
     canonicalPageKey: "stock:krx:005930"
   },
   [SK_HYNIX]: {
+    aliases: ["SKH", "Hynix Memory"],
     market: "KRX",
     ticker: "000660",
     name: "SK hynix",
@@ -73,6 +76,7 @@ const profiles: Record<string, CompanyProfile> = {
     canonicalPageKey: "stock:krx:000660"
   },
   [NAVER]: {
+    aliases: ["Line Commerce", "Naver Portal"],
     market: "KRX",
     ticker: "035420",
     name: "NAVER",
@@ -172,6 +176,31 @@ export const phase0Fixtures = {
   profiles,
   filings,
   corporateActions
+};
+
+export const searchIndexEventFixtures: SearchIndexEvent[] = [
+  {
+    id: "search-event-approved-005930",
+    kind: "approved_review",
+    occurredAt: "2026-04-01T00:10:00.000Z",
+    pageKey: "stock:krx:005930"
+  },
+  {
+    id: "search-event-alias-000660",
+    kind: "alias_updated",
+    occurredAt: "2026-04-01T00:16:00.000Z",
+    pageKey: "stock:krx:000660"
+  },
+  {
+    id: "search-event-discussion-005930",
+    kind: "discussion_created",
+    occurredAt: "2026-04-01T00:24:00.000Z",
+    pageKey: "stock:krx:005930"
+  }
+];
+
+export const searchIndexFixtureCheckpoint = {
+  indexedThrough: "2026-04-01T00:18:00.000Z"
 };
 
 export type FixtureCitationRecord = CitationRecord;

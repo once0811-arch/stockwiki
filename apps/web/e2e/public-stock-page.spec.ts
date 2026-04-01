@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("renders the public stock page read model", async ({ page }) => {
   await page.goto("/stocks/krx/005930");
 
-  await expect(page.getByText("Phase 5 Discussion Slice")).toBeVisible();
+  await expect(page.getByText("Phase 6 Search Slice")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Samsung Electronics" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "System Data" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Approved Wiki" })).toBeVisible();
@@ -11,7 +11,23 @@ test("renders the public stock page read model", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Trust & Sources" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "References" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Open Discussion" })).toBeVisible();
-  await expect(page.getByPlaceholder("Search placeholder for aliases, filings, and related pages")).toBeVisible();
+  await expect(page.getByPlaceholder("Search by ticker, company name, or alias")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Search" })).toBeVisible();
+});
+
+test("renders the search page for exact ticker and alias queries", async ({ page }) => {
+  await page.goto("/search?q=005930");
+
+  await expect(page.getByRole("heading", { name: "Search" })).toBeVisible();
+  await expect(page.getByText("Index Lag")).toBeVisible();
+  await expect(page.getByText("Exact ticker", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Samsung Electronics" }).first()).toBeVisible();
+
+  await page.getByLabel("Search Query").fill("SEC");
+  await page.getByRole("button", { name: "Search" }).click();
+
+  await expect(page.getByText("Alias match")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Samsung Electronics" }).first()).toBeVisible();
 });
 
 test("renders the stock discussion page and lets a member create a thread", async ({ page }) => {

@@ -31,6 +31,7 @@ Phase 0~3에서 남겼던 부채를 backlog보다 더 운영 친화적으로 추
 | D-017 | Phase 4 | source policy findings / dead-link scan 결과를 persistent workflow 와 저장소로 치환 | Deferred by architecture | 현재 Phase 4 목표는 fake-first policy wiring 이며 DB/workflow schema 는 아직 없다 | moderation persistence 또는 worker workflow slice 에서 replacement |
 | D-018 | Phase 5 | discussion thread/comment/report store 를 persistent app DB adapter 로 치환 | Deferred by architecture | 현재 discussion state 는 process memory 와 seed fixtures 에만 존재한다 | app DB schema 와 discussion repository adapter 가 준비되는 slice 에서 replacement |
 | D-019 | Phase 5 | discussion report, pin/lock, audit trail 을 dedicated admin/mod queue 로 분리 | Deferred by scope | Phase 5 는 discussion page usable 과 basic moderation shell 을 닫는 데 집중했다 | moderation admin queue 와 audit persistence slice 에서 분리 |
+| D-020 | Phase 6 | fake-first search read model / lag snapshot 을 real OpenSearch adapter 와 persistent index 로 치환 | Deferred by architecture | 현재 search 는 fixture alias, in-memory discussion state, static indexing event stream 을 사용한다 | search infra / app DB schema 가 준비되는 slice 에서 adapter 치환 |
 
 ## Notes
 

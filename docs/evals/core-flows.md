@@ -59,6 +59,15 @@ Phase 별로 반드시 검증해야 할 핵심 사용자 흐름을 정리한다.
 - stock pages show a live discussion summary sourced from the discussion read model and preserve actor context when linking into discussion
 - discussion write/moderation actions reject thread/comment ids that belong to a different stock page
 
+## Phase 6
+
+- `/search` renders exact ticker, canonical title, alias, and discussion-title matches from the fake-first search read model
+- `GET /api/public/search?q=` returns the same grouped result contract as the page shell
+- public stock results exclude visible-noindex pages and keep reviewed-content-first ranking
+- alias-aware autocomplete suggestions stay available without requiring a real OpenSearch adapter
+- stock pages expose a live search form that routes into `/search`
+- worker search indexing skeleton surfaces handled event kinds and lag metrics for approved review, alias update, and discussion created events
+
 ## Contract Eval Targets
 
 ### WikiEngine

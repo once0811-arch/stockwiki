@@ -14,6 +14,7 @@ import {
   type DiscussionSummarySnapshot
 } from "../discussion/discussion-read-model";
 import type { DiscussionPreviewItem } from "../discussion/types";
+import { searchPlaceholderText } from "../search/search-read-model";
 import type { StockPageState } from "./stock-page-seeds";
 import {
   getStockWikiSnapshot,
@@ -76,7 +77,7 @@ export async function getStockPageData(input: StockKey, actor?: string): Promise
     profile,
     quote,
     revisionSummary: snapshot.revisionSummary,
-    searchPlaceholder: "Search placeholder for aliases, filings, and related pages",
+    searchPlaceholder: searchPlaceholderText,
     sourceTierGuidance: sourceTierDefinitions,
     wiki: snapshot.wiki
   };

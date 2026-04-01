@@ -2,12 +2,18 @@
 
 상세 debt ledger: `docs/progress/debt-ledger.md`
 
-## Phase 6 Backlog
+## Phase 7 Backlog
 
-1. exact ticker / canonical title / alias match 를 지원하는 fake-first search index contract 와 fixture set 추가
-2. `/search` page 와 `GET /api/public/search?q=` shell 을 구현하고 reviewed-content-first ranking 을 고정
-3. autocomplete 와 alias support 를 포함한 기본 result grouping 을 추가
-4. approved review, alias update, discussion created 이벤트를 받는 indexing pipeline skeleton 과 lag metric surface 를 추가
+1. watchlist add/remove shell 과 fake session gating 을 추가
+2. notification center shell 을 만들고 watchlist / approved revision / discussion reply event 를 묶는다
+3. digest email stub 와 notification preference surface 를 추가
+4. approved revision notify 와 discussion reply notify worker skeleton 을 추가
+
+## Deferred From Phase 6
+
+1. fake-first search read model 과 lag snapshot 을 real OpenSearch adapter / persistent index 로 치환
+2. typo correction, filter facets, recent searches 를 richer search UX slice 로 확장
+3. public search result set 을 theme / industry / people / event pages 까지 확장
 
 ## Deferred From Phase 5
 
@@ -35,5 +41,4 @@
 
 ## Deferred From Phase 0
 
-1. local infra 실제 기동 smoke (`docker compose up`) 와 healthcheck 추가
-2. MediaWiki extension profiles 세분화
+1. MediaWiki extension profiles 세분화

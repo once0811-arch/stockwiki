@@ -28,4 +28,16 @@ describe("FixtureMarketDataProvider", () => {
       ticker: "000660"
     });
   });
+
+  it("returns alias-aware company profiles for search fixtures", async () => {
+    const provider = new FixtureMarketDataProvider();
+    await expect(
+      provider.getCompanyProfile({
+        market: "KRX",
+        ticker: "005930"
+      })
+    ).resolves.toMatchObject({
+      aliases: ["SEC", "Samsung Elec"]
+    });
+  });
 });

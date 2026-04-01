@@ -1,6 +1,6 @@
 # Current Phase
 
-- current phase: Phase 6 - search
+- current phase: Phase 7 - watchlist / notifications
 - completed:
   - Phase 0 repository bootstrap closed with passing workspace checks
   - Phase 1 read-only stock page MVP closed
@@ -8,6 +8,7 @@
   - Phase 3 edit proposal flow closed
   - Phase 4 citation and trust policy closed
   - Phase 5 discussion system closed
+  - Phase 6 search shell closed
   - `/stocks/[market]/[ticker]/discussion` now renders fixture-backed thread list, thread creation, comment/reply flows, helpful votes, comment reports, and reviewer pin/lock actions
   - discussion threads stay separated from approved wiki content while linking back to citation-aware article sections
   - stock pages now read discussion summary data from the live discussion read model instead of placeholder preview seeds
@@ -15,30 +16,29 @@
   - discussion moderation summary exposes reported comments, locked threads, and resolved thread counts without changing approved article render rules
   - discussion actions now reject thread/comment ids that do not belong to the current stock page
   - local Docker runtime is now available via Colima and the full infra compose stack boots successfully after fixing the Temporal auto-setup driver
+  - `/search` and `GET /api/public/search?q=` now share a fake-first read model for exact ticker, canonical title, alias, and discussion-title queries
+  - public stock search excludes visible noindex pages and keeps reviewed-content-first ranking ahead of discussion results
+  - search autocomplete suggestions now reuse alias-aware fixture data and stock pages route directly into the live search shell
+  - approved review, alias update, and discussion created events now feed a shared search indexing lag snapshot for web and workers
 - in progress:
-  - scoping the first Phase 6 search indexing slice
+  - scoping the first Phase 7 watchlist and notification slice
 - blockers:
   - none
 - next slice:
-  - add a fake-first search index read model for exact ticker, canonical title, and alias matching
-  - implement `/search` and `GET /api/public/search?q=` shells with reviewed-content-first ranking
-  - add indexing pipeline skeleton and lag metric surface for approved wiki, alias, and discussion events
+  - add fake-first watchlist add/remove flow for signed-in member, contributor, and reviewer sessions
+  - expose notification center shell with approved revision and discussion reply events
+  - add digest email stub and notification worker skeleton
 - verification snapshot:
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" node -v` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm -v` passed
-  - `docker compose -f infra/compose/docker-compose.yml config` passed
-  - `docker compose -f infra/compose/docker-compose.yml up -d` passed
-  - `docker compose -f infra/compose/docker-compose.yml ps -a` passed
-  - `docker exec compose-postgres-1 pg_isready -U stockwiki` passed
-  - `docker exec compose-redis-1 redis-cli ping` passed
-  - `curl -fsS http://localhost:9200` passed
-  - `curl -fsS http://localhost:8081 >/dev/null && echo mediawiki-ok` passed
-  - `curl -fsS http://localhost:8233 >/dev/null && echo temporal-ui-ok` passed
-  - `docker compose -f infra/compose/docker-compose.yml down` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/fixtures test` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers typecheck` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers test` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web typecheck` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/stock-page.test.tsx tests/discussion-flow.test.ts` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/search-flow.test.ts tests/stock-page.test.tsx` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test:e2e` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm check` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm build` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" ./scripts/hooks/post-edit-check.sh` passed
   - `./scripts/hooks/guard-secrets.sh` passed
+  - `docker compose -f infra/compose/docker-compose.yml config` passed

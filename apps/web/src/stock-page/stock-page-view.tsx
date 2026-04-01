@@ -26,7 +26,7 @@ export function StockPageView(props: { data: StockPageData }) {
         gap: "1.5rem"
       }}
     >
-      <PhaseBadge>Phase 5 Discussion Slice</PhaseBadge>
+      <PhaseBadge>Phase 6 Search Slice</PhaseBadge>
 
       <header
         style={{
@@ -82,20 +82,39 @@ export function StockPageView(props: { data: StockPageData }) {
             </div>
           </div>
         </div>
-        <label style={{ display: "grid", gap: "0.5rem", maxWidth: "26rem" }}>
-          <span style={{ fontWeight: 600 }}>Search placeholder</span>
-          <input
-            readOnly
-            value=""
-            placeholder={data.searchPlaceholder}
-            style={{
-              border: "1px solid #cbd5e1",
-              borderRadius: "999px",
-              padding: "0.85rem 1rem",
-              backgroundColor: "#fff"
-            }}
-          />
-        </label>
+        <form action="/search" method="get" style={{ display: "grid", gap: "0.5rem", maxWidth: "32rem" }}>
+          <label htmlFor="stock-page-search" style={{ fontWeight: 600 }}>
+            Search StockWiki
+          </label>
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+            <input
+              id="stock-page-search"
+              name="q"
+              placeholder={data.searchPlaceholder}
+              style={{
+                flex: "1 1 18rem",
+                border: "1px solid #cbd5e1",
+                borderRadius: "999px",
+                padding: "0.85rem 1rem",
+                backgroundColor: "#fff"
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                border: 0,
+                borderRadius: "999px",
+                padding: "0.85rem 1.1rem",
+                background: "#0f172a",
+                color: "#f8fafc",
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
+            >
+              Search
+            </button>
+          </div>
+        </form>
       </header>
 
       <section
