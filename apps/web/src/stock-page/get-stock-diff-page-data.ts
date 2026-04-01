@@ -34,10 +34,13 @@ export async function getStockDiffPageData(input: StockKey, comparison: string) 
         };
 
   return {
+    citationSections: snapshot.citationSections,
     diff,
     fromRevision,
+    fromSources: snapshot.historySources.find((revision) => revision.revisionId === fromRevision.id),
     profile,
-    toRevision
+    toRevision,
+    toSources: snapshot.historySources.find((revision) => revision.revisionId === toRevision.id)
   };
 }
 

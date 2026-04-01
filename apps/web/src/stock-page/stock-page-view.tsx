@@ -14,6 +14,7 @@ function formatPercent(value: number): string {
 
 export function StockPageView(props: { data: StockPageData }) {
   const { data } = props;
+  const preferredTierLabels = data.sourceTierGuidance.map((tier) => tier.label).join(" -> ");
 
   return (
     <main
@@ -25,7 +26,7 @@ export function StockPageView(props: { data: StockPageData }) {
         gap: "1.5rem"
       }}
     >
-      <PhaseBadge>Phase 3 Review Workflow Slice</PhaseBadge>
+      <PhaseBadge>Phase 4 Citation Policy Slice</PhaseBadge>
 
       <header
         style={{
@@ -48,17 +49,27 @@ export function StockPageView(props: { data: StockPageData }) {
             </span>
             <span style={{ color: "#334155", fontSize: "0.95rem" }}>{data.pageStateSummary}</span>
           </div>
-          <div style={{ display: "grid", gap: "0.35rem" }}>
-            <span style={{ color: "#0f172a", fontWeight: 600 }}>
-              Public page pinned to approved revision {data.revisionSummary.approvedRevisionId}
-            </span>
-            <span style={{ color: "#475569", fontSize: "0.95rem" }}>
+	          <div style={{ display: "grid", gap: "0.35rem" }}>
+	            <span style={{ color: "#0f172a", fontWeight: 600 }}>
+	              Public page pinned to approved revision {data.revisionSummary.approvedRevisionId}
+	            </span>
+	            <span style={{ color: "#475569", fontSize: "0.95rem" }}>
               Latest revision {data.revisionSummary.latestRevisionId} is {data.revisionSummary.latestRevisionStatus}.
               {` ${data.revisionSummary.pendingRevisionCount} pending revision${data.revisionSummary.pendingRevisionCount === 1 ? "" : "s"} waiting for review.`}
-            </span>
-            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-              <Link href={data.editPath} style={linkStyle}>
-                Edit This Page
+	            </span>
+	            <span style={{ color: "#475569", fontSize: "0.95rem" }}>
+	              Approved revision carries {data.approvedSources.policy.citationCount} citation
+	              {data.approvedSources.policy.citationCount === 1 ? "" : "s"}.
+	              {` Preferred source ladder: ${preferredTierLabels}.`}
+	            </span>
+	            {data.latestSources.policy.status !== "clear" ? (
+	              <span style={{ color: "#92400e", fontSize: "0.95rem" }}>
+	                Latest revision is waiting with a {data.latestSources.policy.status} source-policy review state.
+	              </span>
+	            ) : null}
+	            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+	              <Link href={data.editPath} style={linkStyle}>
+	                Edit This Page
               </Link>
               <Link href={data.revisionSummary.historyPath} style={linkStyle}>
                 View Revision History
@@ -122,11 +133,11 @@ export function StockPageView(props: { data: StockPageData }) {
           </dl>
         </article>
 
-        <article style={cardStyle}>
-          <h2 style={headingStyle}>Approved Wiki</h2>
-          <div dangerouslySetInnerHTML={{ __html: data.wiki.html }} style={{ lineHeight: 1.7 }} />
-        </article>
-      </section>
+	        <article style={cardStyle}>
+	          <h2 style={headingStyle}>Approved Wiki</h2>
+	          <div dangerouslySetInnerHTML={{ __html: data.wiki.html }} style={{ lineHeight: 1.7 }} />
+	        </article>
+	      </section>
 
       <section
         style={{
@@ -160,20 +171,82 @@ export function StockPageView(props: { data: StockPageData }) {
           </ul>
         </article>
 
-        <article style={cardStyle}>
-          <h2 style={headingStyle}>Corporate Actions</h2>
-          <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
-            {data.corporateActions.map((item) => (
+	        <article style={cardStyle}>
+	          <h2 style={headingStyle}>Corporate Actions</h2>
+	          <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
+	            {data.corporateActions.map((item) => (
               <li key={item.id}>
                 <strong>{item.actionType}</strong>
                 <div>{item.summary}</div>
               </li>
-            ))}
-          </ul>
-        </article>
-      </section>
-    </main>
+	            ))}
+	          </ul>
+	        </article>
+
+	        <article style={cardStyle}>
+	          <h2 style={headingStyle}>Trust & Sources</h2>
+	          <p style={{ margin: 0, lineHeight: 1.7 }}>
+	            Citation-required sections stay visible even while public readers remain pinned to the approved revision.
+	          </p>
+	          <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
+	            {data.citationSections.map((section) => (
+	              <li key={section.id}>
+	                <strong>{section.label}</strong>
+	                <div>{section.description}</div>
+	                <div>
+	                  {section.citationRequired ? "Citation required" : "Citation optional"}
+	                  {section.contentious ? " / High-risk review" : ""}
+	                </div>
+	              </li>
+	            ))}
+	          </ul>
+	          {data.approvedSources.policy.findings.length > 0 ? (
+	            <div style={warningPanelStyle}>
+	              <strong>Approved revision warnings</strong>
+	              <ul style={warningListStyle}>
+	                {data.approvedSources.policy.findings.map((finding) => (
+	                  <li key={`${finding.code}-${finding.sectionId ?? "general"}`}>{finding.message}</li>
+	                ))}
+	              </ul>
+	            </div>
+	          ) : (
+	            <div style={successPanelStyle}>Approved revision currently satisfies the fake-first source policy checks.</div>
+	          )}
+	        </article>
+
+	        <article style={cardStyle}>
+	          <h2 style={headingStyle}>References</h2>
+	          {data.approvedSources.citations.length === 0 ? (
+	            <p style={{ margin: 0 }}>No citations are attached to the approved revision yet.</p>
+	          ) : (
+	            <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
+	              {data.approvedSources.citations.map((citation) => (
+	                <li key={citation.id}>
+	                  <strong>{citation.label}</strong>
+	                  <div>{formatSectionLabel(data, citation.sectionId)}</div>
+	                  <div>
+	                    {formatTierLabel(data, citation.sourceTier)}
+	                    {citation.publishedAt ? ` / ${citation.publishedAt}` : ""}
+	                  </div>
+	                  <a href={citation.sourceUrl} style={linkStyle}>
+	                    {citation.sourceUrl}
+	                  </a>
+	                </li>
+	              ))}
+	            </ul>
+	          )}
+	        </article>
+	      </section>
+	    </main>
   );
+}
+
+function formatSectionLabel(data: StockPageData, sectionId: string): string {
+  return data.citationSections.find((section) => section.id === sectionId)?.label ?? sectionId;
+}
+
+function formatTierLabel(data: StockPageData, tier: string): string {
+  return data.sourceTierGuidance.find((item) => item.tier === tier)?.label ?? tier;
 }
 
 const cardStyle = {
@@ -228,4 +301,27 @@ const linkStyle = {
   color: "#0f172a",
   fontWeight: 700,
   textDecoration: "underline"
+} as const;
+
+const successPanelStyle = {
+  padding: "1rem",
+  borderRadius: "0.85rem",
+  backgroundColor: "#dcfce7",
+  color: "#166534"
+} as const;
+
+const warningPanelStyle = {
+  padding: "1rem",
+  borderRadius: "0.85rem",
+  backgroundColor: "#fef3c7",
+  color: "#92400e",
+  display: "grid",
+  gap: "0.5rem"
+} as const;
+
+const warningListStyle = {
+  margin: 0,
+  paddingLeft: "1.1rem",
+  display: "grid",
+  gap: "0.5rem"
 } as const;

@@ -41,6 +41,15 @@ Phase 별로 반드시 검증해야 할 핵심 사용자 흐름을 정리한다.
 - reviewer approval updates the public approved render and emits a reputation event
 - reviewer rejection keeps the public render unchanged while history records the rejected status
 
+## Phase 4
+
+- `/stocks/[market]/[ticker]/edit` shows citation-required sections, source tier guidance, and citation helper inputs
+- source policy evaluation flags missing required citations, low-tier sources, and outdated sources before review
+- source-less contentious edits are prioritized in `/review/mod-queue` with `no_citation` reasons
+- public stock pages render trust/source guidance and approved revision references without breaking approved-render pinning
+- history/diff pages expose citation counts and source policy states per revision
+- worker dead-link scan skeleton classifies citation URLs as reachable, dead, or skipped
+
 ## Contract Eval Targets
 
 ### WikiEngine

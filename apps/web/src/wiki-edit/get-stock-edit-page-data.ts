@@ -2,6 +2,7 @@ import { FixtureMarketDataProvider } from "@stockwiki/fixtures";
 import type { StockKey } from "@stockwiki/domain";
 import { getStockWikiSnapshot } from "../stock-page/get-stock-wiki-snapshot";
 import { evaluateEditAccess, getFakeSession } from "./fake-session";
+import { getSourceTierGuidance } from "./source-policy";
 
 const marketDataProvider = new FixtureMarketDataProvider();
 
@@ -17,10 +18,12 @@ export async function getStockEditPageData(input: StockKey & { actor?: string })
   return {
     access: evaluateEditAccess(session, snapshot.page.protectionLevel),
     actor: input.actor,
+    citationSections: snapshot.citationSections,
     historyPath: snapshot.revisionSummary.historyPath,
     prefillContent: snapshot.approvedRevision.contentMarkdown,
     profile,
-    session
+    session,
+    sourceTierGuidance: getSourceTierGuidance()
   };
 }
 

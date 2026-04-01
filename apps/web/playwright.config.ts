@@ -15,7 +15,7 @@ export default defineConfig({
     }
   ],
   webServer: {
-    command: "pnpm exec next dev --port 3100",
+    command: "corepack pnpm exec next dev --port 3100",
     port: 3100,
     reuseExistingServer: !process.env.CI,
     stdout: "pipe",

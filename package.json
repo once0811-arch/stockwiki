@@ -8,13 +8,13 @@
     "pnpm": ">=10.32.1"
   },
   "scripts": {
-    "build": "turbo run build",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm validate:docs",
-    "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint && eslint scripts --max-warnings=0 && pnpm lint:docs",
+    "build": "corepack pnpm exec turbo run build",
+    "check": "corepack pnpm lint && corepack pnpm typecheck && corepack pnpm test && corepack pnpm validate:docs",
+    "dev": "corepack pnpm exec turbo run dev --parallel",
+    "lint": "corepack pnpm exec turbo run lint && eslint scripts --max-warnings=0 && corepack pnpm lint:docs",
     "lint:docs": "markdownlint-cli2",
-    "test": "turbo run test",
-    "typecheck": "turbo run typecheck && tsc --noEmit --project tsconfig.scripts.json",
+    "test": "corepack pnpm exec turbo run test",
+    "typecheck": "corepack pnpm exec turbo run typecheck && tsc --noEmit --project tsconfig.scripts.json",
     "validate:docs": "tsx scripts/validate-docs.ts"
   },
   "devDependencies": {

@@ -14,8 +14,19 @@ export async function getStockHistoryPageData(input: StockKey) {
 
   return {
     approvedRevisionId: snapshot.revisionSummary.approvedRevisionId,
+    citationSections: snapshot.citationSections,
     comparePath: snapshot.revisionSummary.latestDiffPath,
-    history: snapshot.history,
+    history: snapshot.history.map((revision) => {
+      const sourceData = snapshot.historySources.find((item) => item.revisionId === revision.id);
+
+      return {
+        ...revision,
+        citationCount: sourceData?.policy.citationCount ?? 0,
+        findingCount: sourceData?.policy.findings.length ?? 0,
+        policyStatus: sourceData?.policy.status ?? "clear",
+        reportReasons: sourceData?.policy.reportReasons ?? []
+      };
+    }),
     latestRevisionId: snapshot.revisionSummary.latestRevisionId,
     profile
   };

@@ -2,12 +2,18 @@
 
 상세 debt ledger: `docs/progress/debt-ledger.md`
 
-## Phase 4 Backlog
+## Phase 5 Backlog
 
-1. citation helper UI 와 source tier scaffolding 추가
-2. source presence checks 와 outdated source warnings 추가
-3. report reason `no citation` 과 moderation rule hook 추가
-4. contentious edit queue 와 citation-required section rule 을 연결
+1. stock page 에 thread list/create discussion shell 추가
+2. comment/reply fake-first flow 와 helpful vote read model 추가
+3. report comment, pin/lock, section-anchor linking shell 추가
+4. article page discussion summary 를 실제 discussion read model 에 연결
+
+## Deferred From Phase 4
+
+1. fixed-slot citation helper 를 dynamic ref composer / richer editor shell 로 확장
+2. source policy findings, report reasons, dead-link scan 결과를 persistent app DB adapter 로 치환
+3. real MediaWiki ref parsing / source normalization / retryable dead-link workflow 연결
 
 ## Deferred From Phase 3
 

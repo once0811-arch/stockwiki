@@ -2,7 +2,7 @@
 
 ## Scope
 
-현재 저장소는 Phase 3에서 도입한 fake-first moderation queue 와 reviewer workflow 를 유지한다.
+현재 저장소는 Phase 4에서 citation / trust policy 가 연결된 fake-first moderation queue 와 reviewer workflow 를 유지한다.
 실제 persistence, abuse automation, sanctions 는 later phase 로 남겨둔다.
 
 ## Principles
@@ -20,18 +20,23 @@
 4. 앱 큐: pending edit review, reports, sanctions
 5. 사후 대응: revert, lock, suspend, ban
 
-## Current Phase 3 Operator Actions
+## Current Phase 4 Operator Actions
 
 - pending edit proposal 은 `/review/mod-queue` 에서 reviewer 가 approve/reject 한다.
 - anonymous entry 는 `/login` demo login shell 을 통해 fake session 으로 이어진다.
 - public page 는 approved revision 만 노출한다.
 - approve/reject 는 fake-first reputation event 를 남긴다.
+- edit proposal 은 changed sections, citations, source tier, published date 를 함께 제출한다.
+- source-less contentious edit 는 `no_citation` report reason 과 함께 queue 상단으로 올라온다.
+- reviewer queue 는 source policy status, findings, citation count, report reasons 를 같이 보여준다.
+- dead-link scan 은 worker skeleton 으로만 존재하며 실제 retry/persistence 는 아직 없다.
 - fake session harness 와 in-memory queue 는 운영 구현이 아니므로 `docs/progress/backlog.md` 에 후속 치환 작업을 남긴다.
 - MediaWiki DB direct access 는 계속 금지한다.
 
 ## Deferred Moderation Work
 
 - abuse keyword / citation policy rule hooks
+- richer citation editor UX 와 source normalization
 - moderator sanctions, warn/suspend/ban
 - assignee, bulk actions, filter/sort, audit log persistence
 - app DB backed queue and reputation event store

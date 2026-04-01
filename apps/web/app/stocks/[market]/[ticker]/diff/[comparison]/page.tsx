@@ -36,23 +36,73 @@ export default async function StockDiffPage(props: StockDiffRouteProps) {
           <h1 style={titleStyle}>Revision Diff</h1>
           <p style={descriptionStyle}>{data.diff.summary}</p>
         </header>
-        <section style={gridStyle}>
-          <article style={cardStyle}>
-            <h2 style={headingStyle}>From {data.fromRevision.id}</h2>
-            <strong>{data.fromRevision.summary}</strong>
-            <pre style={preStyle}>{data.fromRevision.contentMarkdown}</pre>
-          </article>
-          <article style={cardStyle}>
-            <h2 style={headingStyle}>To {data.toRevision.id}</h2>
-            <strong>{data.toRevision.summary}</strong>
-            <pre style={preStyle}>{data.toRevision.contentMarkdown}</pre>
-          </article>
-        </section>
+	        <section style={gridStyle}>
+	          <article style={cardStyle}>
+	            <h2 style={headingStyle}>From {data.fromRevision.id}</h2>
+	            <strong>{data.fromRevision.summary}</strong>
+	            <pre style={preStyle}>{data.fromRevision.contentMarkdown}</pre>
+	            <SourceMetadataCard
+	              citationSections={data.citationSections}
+	              citations={data.fromSources?.citations ?? []}
+	              findings={data.fromSources?.policy.findings ?? []}
+	              policyStatus={data.fromSources?.policy.status ?? "clear"}
+	            />
+	          </article>
+	          <article style={cardStyle}>
+	            <h2 style={headingStyle}>To {data.toRevision.id}</h2>
+	            <strong>{data.toRevision.summary}</strong>
+	            <pre style={preStyle}>{data.toRevision.contentMarkdown}</pre>
+	            <SourceMetadataCard
+	              citationSections={data.citationSections}
+	              citations={data.toSources?.citations ?? []}
+	              findings={data.toSources?.policy.findings ?? []}
+	              policyStatus={data.toSources?.policy.status ?? "clear"}
+	            />
+	          </article>
+	        </section>
       </main>
     );
   } catch {
     notFound();
   }
+}
+
+function SourceMetadataCard(props: {
+  citationSections: Array<{ id: string; label: string }>;
+  citations: Array<{ id: string; label: string; sectionId: string; sourceTier: string; sourceUrl: string }>;
+  findings: Array<{ code: string; message: string }>;
+  policyStatus: string;
+}) {
+  return (
+    <section style={sourceCardStyle}>
+      <strong>Source Policy: {props.policyStatus}</strong>
+      {props.citations.length === 0 ? (
+        <div>No citations attached to this revision.</div>
+      ) : (
+        <ul style={metaListStyle}>
+          {props.citations.map((citation) => (
+            <li key={citation.id}>
+              {citation.label} ({resolveSectionLabel(props.citationSections, citation.sectionId)} / {citation.sourceTier})
+            </li>
+          ))}
+        </ul>
+      )}
+      {props.findings.length > 0 ? (
+        <ul style={metaListStyle}>
+          {props.findings.map((finding) => (
+            <li key={`${finding.code}-${finding.message}`}>{finding.message}</li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
+function resolveSectionLabel(
+  sections: Array<{ id: string; label: string }>,
+  sectionId: string
+): string {
+  return sections.find((section) => section.id === sectionId)?.label ?? sectionId;
 }
 
 const heroStyle = {
@@ -114,4 +164,20 @@ const linkStyle = {
   color: "#0f172a",
   fontWeight: 700,
   textDecoration: "underline"
+} as const;
+
+const metaListStyle = {
+  margin: 0,
+  paddingLeft: "1.1rem",
+  display: "grid",
+  gap: "0.5rem"
+} as const;
+
+const sourceCardStyle = {
+  padding: "1rem",
+  borderRadius: "0.85rem",
+  backgroundColor: "#f8fafc",
+  border: "1px solid #cbd5e1",
+  display: "grid",
+  gap: "0.5rem"
 } as const;

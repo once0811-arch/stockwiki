@@ -27,6 +27,8 @@ Phase 0~3에서 남겼던 부채를 backlog보다 더 운영 친화적으로 추
 | D-012 | Phase 3 | in-memory review queue 와 reputation event store 를 persistent adapter 로 치환 | Deferred by architecture | moderation persistence 와 audit schema 가 아직 없다 | moderation/app DB slice 에서 replacement |
 | D-013 | Phase 3 | demo login shell 을 real auth/session flow 로 치환 | Deferred by roadmap | fake-first E2E 목적은 달성했지만 실제 인증 제품은 아직 phase 밖이다 | auth 도입 slice 에서 replacement |
 | D-014 | Harness | `schema` / `api` / `dto` 변경 시 OpenAPI 또는 타입 생성 검증 hook | Not yet implemented | 현재 저장소에 generation pipeline 이 없어서 hook 이 진짜 검증을 수행할 수 없다 | OpenAPI/typegen pipeline 도입과 함께 hook 연결 |
+| D-016 | Phase 4 | fixed-slot citation helper 를 richer dynamic ref editor 로 확장 | Deferred by product scope | Phase 4 는 source policy shell 을 닫는 데 집중했고 editor ergonomics 확장은 다음 slice 가치가 더 높다 | discussion phase 이후 authoring ergonomics slice 에서 확장 |
+| D-017 | Phase 4 | source policy findings / dead-link scan 결과를 persistent workflow 와 저장소로 치환 | Deferred by architecture | 현재 Phase 4 목표는 fake-first policy wiring 이며 DB/workflow schema 는 아직 없다 | moderation persistence 또는 worker workflow slice 에서 replacement |
 
 ## Notes
 

@@ -43,18 +43,24 @@ export default async function StockHistoryPage(props: StockHistoryRouteProps) {
           ) : null}
         </header>
         <section style={listStyle}>
-          {data.history.map((revision) => (
-            <article key={revision.id} style={cardStyle}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
-                <strong>{revision.summary}</strong>
-                <span style={historyStatusStyles[revision.status]}>{revision.status}</span>
-              </div>
-              <div>Revision ID: {revision.id}</div>
-              <div>Author: {revision.authorId}</div>
-              <div>Created At: {revision.createdAt}</div>
-            </article>
-          ))}
-        </section>
+	          {data.history.map((revision) => (
+	            <article key={revision.id} style={cardStyle}>
+	              <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
+	                <strong>{revision.summary}</strong>
+	                <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+	                  <span style={historyStatusStyles[revision.status]}>{revision.status}</span>
+	                  <span style={policyStatusStyles[revision.policyStatus]}>{revision.policyStatus}</span>
+	                </div>
+	              </div>
+	              <div>Revision ID: {revision.id}</div>
+	              <div>Author: {revision.authorId}</div>
+	              <div>Created At: {revision.createdAt}</div>
+	              <div>Citations: {revision.citationCount}</div>
+	              {revision.reportReasons.length > 0 ? <div>Report reasons: {revision.reportReasons.join(", ")}</div> : null}
+	              {revision.findingCount > 0 ? <div>Source policy findings: {revision.findingCount}</div> : null}
+	            </article>
+	          ))}
+	        </section>
       </main>
     );
   } catch {
@@ -118,6 +124,21 @@ const historyStatusStyles = {
   },
   reverted: {
     color: "#1d4ed8",
+    fontWeight: 700
+  }
+} as const;
+
+const policyStatusStyles = {
+  clear: {
+    color: "#166534",
+    fontWeight: 700
+  },
+  warning: {
+    color: "#92400e",
+    fontWeight: 700
+  },
+  flagged: {
+    color: "#991b1b",
     fontWeight: 700
   }
 } as const;

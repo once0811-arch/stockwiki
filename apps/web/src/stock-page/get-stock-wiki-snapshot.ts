@@ -1,7 +1,18 @@
-import type { CompanyProfile, DiffResult, PageContent, PageRevision, RenderedPage, RevisionStatus, StockKey } from "@stockwiki/domain";
+import type {
+  CitationSectionPolicy,
+  CompanyProfile,
+  DiffResult,
+  PageContent,
+  PageRevision,
+  RenderedPage,
+  RevisionSources,
+  RevisionStatus,
+  StockKey
+} from "@stockwiki/domain";
 import { FakeWikiEngine } from "@stockwiki/wiki-bridge";
 import { getStockPageSeed } from "./stock-page-seeds";
 import { listStoredEditProposals } from "../wiki-edit/pending-edit-store";
+import { evaluateSourcePolicy } from "../wiki-edit/source-policy";
 
 export interface StockRevisionSummary {
   approvedRevisionId: string;
@@ -14,13 +25,22 @@ export interface StockRevisionSummary {
 
 export interface StockWikiSnapshot {
   approvedRevision: PageRevision;
+  approvedSources: RevisionSourcesSnapshot;
+  citationSections: CitationSectionPolicy[];
   history: PageRevision[];
+  historySources: RevisionSourcesSnapshot[];
   latestDiff?: DiffResult;
   latestRevision: PageRevision;
+  latestSources: RevisionSourcesSnapshot;
   page: PageContent;
   revisionSummary: StockRevisionSummary;
   seed: ReturnType<typeof getStockPageSeed>;
   wiki: RenderedPage;
+}
+
+export interface RevisionSourcesSnapshot extends RevisionSources {
+  changedSections: CitationSectionPolicy[];
+  revisionId: string;
 }
 
 export async function getStockWikiSnapshot(input: {
@@ -30,15 +50,24 @@ export async function getStockWikiSnapshot(input: {
   const fixtureKey = `${input.key.market}:${input.key.ticker}`;
   const seed = getStockPageSeed(fixtureKey);
   const engine = new FakeWikiEngine();
+  const revisionSourceMap = new Map<string, RevisionSources>();
 
   for (const revision of seed.revisions) {
-    await engine.createOrUpdatePage({
+    const createdRevision = await engine.createOrUpdatePage({
       key: input.profile.canonicalPageKey,
       title: input.profile.name,
       summary: revision.summary,
       contentMarkdown: revision.contentMarkdown,
       authorId: revision.authorId
     });
+    revisionSourceMap.set(
+      createdRevision.revisionId,
+      evaluateSourcePolicy({
+        changedSectionIds: revision.changedSectionIds,
+        citations: revision.citations,
+        sectionPolicies: seed.citationSections
+      })
+    );
   }
 
   for (const draft of listStoredEditProposals(input.profile.canonicalPageKey)) {
@@ -50,6 +79,12 @@ export async function getStockWikiSnapshot(input: {
       summary: draft.summary,
       contentMarkdown: draft.contentMarkdown,
       authorId: draft.authorId
+    });
+    revisionSourceMap.set(draft.revisionId, {
+      changedSectionIds: [...draft.changedSectionIds],
+      citations: [...draft.citations],
+      policy: draft.policy,
+      queuePriority: draft.queuePriority
     });
   }
 
@@ -67,12 +102,19 @@ export async function getStockWikiSnapshot(input: {
       : await engine.compareRevisions(input.profile.canonicalPageKey, approvedRevision.id, latestRevision.id);
   const wiki = await engine.getRenderedHtml(input.profile.canonicalPageKey);
   const basePath = `/stocks/${input.key.market.toLowerCase()}/${input.key.ticker}`;
+  const historySources = history.map((revision) => buildRevisionSourcesSnapshot(seed.citationSections, revision.id, revisionSourceMap));
+  const approvedSources = historySources.find((item) => item.revisionId === approvedRevision.id) ?? emptyRevisionSourcesSnapshot(approvedRevision.id);
+  const latestSources = historySources.find((item) => item.revisionId === latestRevision.id) ?? emptyRevisionSourcesSnapshot(latestRevision.id);
 
   return {
     approvedRevision,
+    approvedSources,
+    citationSections: seed.citationSections,
     history,
+    historySources,
     latestDiff,
     latestRevision,
+    latestSources,
     page,
     revisionSummary: {
       approvedRevisionId: approvedRevision.id,
@@ -94,4 +136,47 @@ function requireRevision(history: PageRevision[], revisionId: string): PageRevis
   }
 
   return revision;
+}
+
+function buildRevisionSourcesSnapshot(
+  sectionPolicies: CitationSectionPolicy[],
+  revisionId: string,
+  revisionSourceMap: Map<string, RevisionSources>
+): RevisionSourcesSnapshot {
+  const sources = revisionSourceMap.get(revisionId);
+  if (!sources) {
+    return emptyRevisionSourcesSnapshot(revisionId);
+  }
+
+  return {
+    ...sources,
+    changedSectionIds: [...sources.changedSectionIds],
+    changedSections: sectionPolicies.filter((section) => sources.changedSectionIds.includes(section.id)),
+    citations: [...sources.citations],
+    policy: {
+      ...sources.policy,
+      findings: [...sources.policy.findings],
+      reportReasons: [...sources.policy.reportReasons]
+    },
+    revisionId
+  };
+}
+
+function emptyRevisionSourcesSnapshot(revisionId: string): RevisionSourcesSnapshot {
+  return {
+    changedSectionIds: [],
+    changedSections: [],
+    citations: [],
+    policy: {
+      citationCount: 0,
+      findings: [],
+      flaggedForModeration: false,
+      missingRequiredCitation: false,
+      outdatedCitationCount: 0,
+      reportReasons: [],
+      status: "clear"
+    },
+    queuePriority: "normal",
+    revisionId
+  };
 }

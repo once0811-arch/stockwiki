@@ -3,10 +3,13 @@ import { expect, test } from "@playwright/test";
 test("renders the public stock page read model", async ({ page }) => {
   await page.goto("/stocks/krx/005930");
 
+  await expect(page.getByText("Phase 4 Citation Policy Slice")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Samsung Electronics" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "System Data" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Approved Wiki" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Discussion Preview" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Trust & Sources" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "References" })).toBeVisible();
   await expect(page.getByPlaceholder("Search placeholder for aliases, filings, and related pages")).toBeVisible();
 });
 
@@ -40,6 +43,7 @@ test("renders the stock history page with approved and pending revisions", async
   await expect(page.getByRole("heading", { name: "Revision History" })).toBeVisible();
   await expect(page.getByText("phase 2 pending revision")).toBeVisible();
   await expect(page.getByText("approved revision")).toBeVisible();
+  await expect(page.getByText("Citations: 1")).toBeVisible();
   await expect(page.getByRole("link", { name: "Compare Approved vs Latest" })).toBeVisible();
 });
 
@@ -49,6 +53,7 @@ test("renders the stock diff page for approved vs pending revisions", async ({ p
   await expect(page.getByRole("heading", { name: "Revision Diff" })).toBeVisible();
   await expect(page.getByText("changed line(s)")).toBeVisible();
   await expect(page.getByText(/^phase 2 pending revision$/)).toBeVisible();
+  await expect(page.getByText("Source Policy: warning")).toBeVisible();
 });
 
 test("gates edit entry for anonymous and non-contributor users", async ({ page }) => {
@@ -59,6 +64,7 @@ test("gates edit entry for anonymous and non-contributor users", async ({ page }
   await expect(page.getByRole("heading", { name: "Demo Login" })).toBeVisible();
   await page.getByRole("link", { name: "Continue As Contributor" }).click();
   await expect(page.getByRole("heading", { name: "Edit Proposal" })).toBeVisible();
+  await expect(page.getByText("Citation Helper")).toBeVisible();
 
   await page.goto("/stocks/krx/005930/edit?actor=member-1");
   await expect(page.getByRole("heading", { name: "Contributor Access Required" })).toBeVisible();
@@ -72,9 +78,16 @@ test("completes the contributor edit to reviewer approval flow", async ({ page }
   await page
     .getByLabel("Proposed Content")
     .fill("StockWiki Phase 3 playwright pending revision.\nSamsung Electronics contributor edit proposal.");
+  await page.getByLabel("Financial Performance").check();
+  await page.getByLabel("Citation 1 Label").fill("Samsung Electronics Q4 2025 earnings release");
+  await page.getByLabel("Citation 1 URL").fill("https://example.test/filings/samsung-q4-2025");
+  await page.getByLabel("Citation 1 Tier").selectOption("tier1");
+  await page.getByLabel("Citation 1 Published Date").fill("2026-01-31");
+  await page.getByLabel("Citation 1 Applies To").selectOption("financial-performance");
   await page.getByRole("button", { name: "Submit Edit Proposal" }).click();
 
   await expect(page.getByText("Pending revision submitted for reviewer queue.")).toBeVisible();
+  await expect(page.getByText("Source policy state: clear")).toBeVisible();
   await page.getByRole("link", { name: "Back To Stock Page" }).click();
 
   await expect(page.getByText("1 pending revision")).toBeVisible();
@@ -85,6 +98,7 @@ test("completes the contributor edit to reviewer approval flow", async ({ page }
 
   await page.goto("/review/mod-queue?actor=reviewer-1");
   await expect(page.getByRole("heading", { name: "Moderation Queue" })).toBeVisible();
+  await expect(page.getByText("Source Policy Flags")).toBeVisible();
   await expect(page.getByText("phase 3 playwright pending revision")).toBeVisible();
   await page.getByRole("button", { name: "Approve Revision" }).click();
 
@@ -106,10 +120,13 @@ test("lets a reviewer reject a pending revision while public content stays uncha
   await page
     .getByLabel("Proposed Content")
     .fill("StockWiki Phase 3 rejected revision.\nNAVER rejected revision should stay out of the public render.");
+  await page.getByLabel("Governance & Risk").check();
   await page.getByRole("button", { name: "Submit Edit Proposal" }).click();
 
+  await expect(page.getByText("Source policy state: flagged")).toBeVisible();
   await page.goto("/review/mod-queue?actor=reviewer-1");
   await expect(page.getByText("phase 3 playwright rejected revision")).toBeVisible();
+  await expect(page.getByText("no_citation")).toBeVisible();
   await page.getByRole("button", { name: "Reject Revision" }).click();
 
   await expect(page.getByText("Revision rejected and kept out of the public render.")).toBeVisible();

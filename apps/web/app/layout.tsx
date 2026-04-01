@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "StockWiki Phase 0",
-  description: "Phase 0 bootstrap surface for StockWiki"
+  title: "StockWiki",
+  description: "Fake-first stock knowledge surfaces and review workflows for StockWiki."
 };
 
 export default function RootLayout(props: { children: ReactNode }): ReactNode {

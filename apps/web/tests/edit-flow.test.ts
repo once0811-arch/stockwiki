@@ -6,7 +6,7 @@ import { getStockEditPageData } from "../src/wiki-edit/get-stock-edit-page-data"
 import { listReputationEvents, resetPendingEditStore } from "../src/wiki-edit/pending-edit-store";
 import { submitStockEditIntent } from "../src/wiki-edit/submit-stock-edit-intent";
 
-describe("phase 3 edit proposal flow", () => {
+describe("phase 4 citation-aware edit proposal flow", () => {
   beforeEach(() => {
     resetPendingEditStore();
   });
@@ -30,12 +30,25 @@ describe("phase 3 edit proposal flow", () => {
     expect(anonymous.access.mode).toBe("login_required");
     expect(member.access.mode).toBe("needs_contributor");
     expect(contributor.access.mode).toBe("can_edit");
+    expect(contributor.citationSections).toHaveLength(4);
     expect(contributor.prefillContent).toContain("Samsung Electronics");
+    expect(contributor.sourceTierGuidance).toHaveLength(4);
   });
 
   it("stores a pending revision while public render stays pinned to approved content", async () => {
     const result = await submitStockEditIntent({
       actor: "contributor-1",
+      changedSectionIds: ["business-model"],
+      citations: [
+        {
+          id: "citation-pending-business-model",
+          label: "Samsung Electronics annual report",
+          publishedAt: "2026-01-31",
+          sectionId: "business-model",
+          sourceTier: "tier1",
+          sourceUrl: "https://example.test/ir/samsung-annual-report-2025"
+        }
+      ],
       contentMarkdown:
         "StockWiki Phase 3 pending revision.\nSamsung Electronics pending revision adds a business structure update.",
       market: "krx",
@@ -45,6 +58,7 @@ describe("phase 3 edit proposal flow", () => {
 
     expect(result.status).toBe("pending");
     expect(result.actor.role).toBe("contributor");
+    expect(result.policyStatus).toBe("clear");
 
     const publicPage = await getStockPageData({
       market: "krx",
@@ -62,9 +76,57 @@ describe("phase 3 edit proposal flow", () => {
     expect(historyPage.history[0]?.status).toBe("pending");
   });
 
+  it("rejects unknown changed sections so source policy checks cannot be bypassed", async () => {
+    await expect(
+      submitStockEditIntent({
+        actor: "contributor-1",
+        changedSectionIds: ["totally-unknown-section"],
+        citations: [],
+        contentMarkdown: "Unknown section bypass attempt",
+        market: "krx",
+        summary: "invalid section attempt",
+        ticker: "005930"
+      })
+    ).rejects.toThrow("Unknown changed sections: totally-unknown-section");
+  });
+
+  it("rejects citations that do not point to a selected changed section", async () => {
+    await expect(
+      submitStockEditIntent({
+        actor: "contributor-1",
+        changedSectionIds: ["business-model"],
+        citations: [
+          {
+            id: "citation-misaligned",
+            label: "Samsung Electronics Q4 2025 earnings release",
+            publishedAt: "2026-01-31",
+            sectionId: "financial-performance",
+            sourceTier: "tier1",
+            sourceUrl: "https://example.test/filings/samsung-q4-2025"
+          }
+        ],
+        contentMarkdown: "Citation points to the wrong section",
+        market: "krx",
+        summary: "misaligned citation attempt",
+        ticker: "005930"
+      })
+    ).rejects.toThrow("Citation citation-misaligned must apply to a selected changed section");
+  });
+
   it("lets a reviewer approve a pending revision and records a reputation event", async () => {
     const pending = await submitStockEditIntent({
       actor: "contributor-1",
+      changedSectionIds: ["financial-performance"],
+      citations: [
+        {
+          id: "citation-approval-financials",
+          label: "Samsung Electronics Q4 2025 earnings release",
+          publishedAt: "2026-01-31",
+          sectionId: "financial-performance",
+          sourceTier: "tier1",
+          sourceUrl: "https://example.test/filings/samsung-q4-2025"
+        }
+      ],
       contentMarkdown:
         "StockWiki Phase 3 approved revision.\nSamsung Electronics approved revision now reflects reviewer approval.",
       market: "krx",
@@ -77,6 +139,7 @@ describe("phase 3 edit proposal flow", () => {
 
     expect(queueBefore.pendingItems).toHaveLength(1);
     expect(queueBefore.pendingItems[0]?.revisionId).toBe(pending.revisionId);
+    expect(queueBefore.pendingItems[0]?.citationCount).toBe(1);
 
     const reviewResult = await approveStockEditProposal({
       actor: "reviewer-1",
@@ -108,11 +171,16 @@ describe("phase 3 edit proposal flow", () => {
   it("lets a reviewer reject a pending revision while the public page stays pinned", async () => {
     const pending = await submitStockEditIntent({
       actor: "contributor-1",
+      changedSectionIds: ["governance-risk"],
+      citations: [],
       contentMarkdown:
         "StockWiki Phase 3 rejected revision.\nNAVER rejected revision should stay out of the public approved render.",
       market: "krx",
       summary: "phase 3 rejection candidate",
       ticker: "035420"
+    });
+    const queueBefore = await getModQueuePageData({
+      actor: "reviewer-1"
     });
 
     const reviewResult = await rejectStockEditProposal({
@@ -131,6 +199,8 @@ describe("phase 3 edit proposal flow", () => {
     const reputationEvents = listReputationEvents();
 
     expect(reviewResult.status).toBe("rejected");
+    expect(queueBefore.pendingItems[0]?.policyStatus).toBe("flagged");
+    expect(queueBefore.pendingItems[0]?.reportReasons).toContain("no_citation");
     expect(publicPage.wiki.html).toContain("Phase 1 noindex fixture page");
     expect(publicPage.wiki.html).not.toContain("Phase 3 rejected revision");
     expect(publicPage.revisionSummary.pendingRevisionCount).toBe(0);

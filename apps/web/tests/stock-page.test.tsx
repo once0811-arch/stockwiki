@@ -15,6 +15,8 @@ describe("stock page read model", () => {
     expect(data.wiki.html).toContain("StockWiki Phase 1 fixture page");
     expect(data.canonicalPath).toBe("/stocks/krx/005930");
     expect(data.indexable).toBe(true);
+    expect(data.approvedSources.policy.citationCount).toBe(2);
+    expect(data.citationSections).toHaveLength(4);
   });
 
   it("returns placeholder content for search and discussions", async () => {
@@ -75,6 +77,7 @@ describe("stock page read model", () => {
     expect(data.wiki.html).not.toContain("pending revision");
     expect(data.revisionSummary.pendingRevisionCount).toBe(1);
     expect(data.revisionSummary.historyPath).toBe("/stocks/krx/000660/history");
+    expect(data.latestSources.policy.status).toBe("warning");
   });
 
   it("loads a visible but noindex stock page fixture", async () => {

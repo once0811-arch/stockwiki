@@ -1,46 +1,40 @@
 # Current Phase
 
-- current phase: Phase 4 - citation and trust policy
+- current phase: Phase 5 - discussion system
 - completed:
   - Phase 0 repository bootstrap closed with passing workspace checks
   - Phase 1 read-only stock page MVP closed
   - Phase 2 wiki bridge and revision model closed
   - Phase 3 edit proposal flow closed
-  - fixture-backed public stock routes now cover `005930`, `000660`, and `035420`
-  - system data card, approved wiki panel, discussion preview placeholder, and search placeholder are wired from fake-first adapters
-  - stock route metadata emits canonical URLs for indexable pages and noindex metadata for review-pending or missing pages
-  - public read smoke now covers reviewed, stale snapshot, visible noindex, and not-found scenarios in Playwright
-  - public stock page now exposes approved/latest revision metadata and keeps pending edits off the default public render
-  - `/stocks/[market]/[ticker]/history` and `/stocks/[market]/[ticker]/diff/[from]...[to]` routes render basic history/diff UI
-  - `FakeWikiEngine` contract now covers pending history filtering, explicit revision render, and deterministic recent changes ordering
-  - app shadow metadata contracts, in-memory shadow store, MediaWikiEngine skeleton, and recent changes sync worker skeleton were added
-  - Ralph Loop rework fixed shadow page metadata so recent changes sync preserves latest revision status and last-edited timestamp
-  - `docs/prd/stockwiki-prd.md` restored to the full root PRD to prevent source-of-truth drift
-  - first-session Ralph prompt updated to preserve the canonical PRD and avoid hard-coding the completion token in example text
-  - `/login` now provides a fake-first demo login shell for role-based edit and review flows
-  - `/stocks/[market]/[ticker]/edit` now gates anonymous, member, contributor, and reviewer entry with a fake session harness
-  - `POST /api/wiki/edit-intents` now saves fake-first pending edit drafts with required edit summary and proposed content
-  - `/review/mod-queue` now lists pending edit proposals with diff preview links and approve/reject actions
-  - `POST /api/wiki/review/[revisionId]/approve` and `/reject` now change review state and write fake-first reputation events
-  - Phase 3 keeps the public stock page pinned to approved content while pending edits wait in queue, then updates the public render only after reviewer approval
-  - Phase 0 debt cleanup added a GitHub Actions CI skeleton, markdown lint/docs validation commands, real hook scripts, and a dedicated debt ledger
-  - conservative Phase 0-3 review closed the root-level script lint/typecheck gap and aligned markdown lint with the current document corpus
+  - Phase 4 citation and trust policy closed
+  - `/stocks/[market]/[ticker]/edit` now shows citation-required sections, source tier guidance, and a fake-first citation helper UI
+  - pending edit drafts now store revision source metadata, report reasons, queue priority, and source policy findings
+  - source policy evaluation now checks missing required citations, low-tier sources, and outdated sources before reviewer approval
+  - `/review/mod-queue` now prioritizes flagged edits and exposes `no_citation` reasons plus source policy findings
+  - public stock pages now render trust/source guidance and approved revision reference lists
+  - history and diff routes now expose citation counts and source policy states for each revision
+  - worker layer now includes a dead-link scan skeleton for citation URLs
+  - `packages/fixtures` now carries moderation fixture cases for citation and source-quality policy tests
 - in progress:
-  - scoping citation helper UI and source presence policy for Phase 4
+  - scoping the first Phase 5 discussion thread slice
 - blockers:
   - none
 - next slice:
-  - add citation helper UI and source-tier scaffolding
-  - add source presence checks and outdated-source warnings on edit proposals
+  - add discussion thread list/create shell to the stock page summary area
+  - add comment/reply fake-first read/write path and moderation hooks for discussion content
 - verification snapshot:
-  - `pnpm --filter @stockwiki/web test -- tests/edit-flow.test.ts` passed
-  - `pnpm --filter @stockwiki/web test:e2e --grep "gates edit entry for anonymous and non-contributor users"` passed
-  - `pnpm --filter @stockwiki/web test:e2e --grep "contributor edit to reviewer approval flow|reviewer reject"` passed
-  - `pnpm --filter @stockwiki/web build` passed
-  - `pnpm --filter @stockwiki/web test:e2e` passed
-  - `pnpm lint:docs` passed
-  - `pnpm validate:docs` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" node -v` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm -v` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm install` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm check` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm build` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web typecheck` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers typecheck` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/wiki-bridge test` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/source-policy.test.ts tests/stock-page.test.tsx tests/edit-flow.test.ts` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers test` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web build` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web exec playwright install chromium` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test:e2e` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" ./scripts/hooks/post-edit-check.sh` passed
   - `./scripts/hooks/guard-secrets.sh` passed
-  - `./scripts/hooks/post-edit-check.sh` passed
-  - `docker compose -f infra/compose/docker-compose.yml config` passed
-  - `pnpm check` passed

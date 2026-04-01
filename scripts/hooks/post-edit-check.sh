@@ -3,6 +3,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
+pnpm_cmd=(corepack pnpm)
 
 changed_files="$(
   {
@@ -30,18 +31,18 @@ if [ -n "$package_dirs" ]; then
     [ -f "$package_dir/package.json" ] || continue
 
     package_name="$(node -e "process.stdout.write(require('./${package_dir}/package.json').name)")"
-    echo "-> pnpm --filter $package_name lint"
-    pnpm --filter "$package_name" lint
+    echo "-> corepack pnpm --filter $package_name lint"
+    "${pnpm_cmd[@]}" --filter "$package_name" lint
   done
 else
   echo "No workspace package changes detected."
 fi
 
 if printf '%s\n' "$changed_files" | grep -Eq '\.md$'; then
-  echo "-> pnpm lint:docs"
-  pnpm lint:docs
-  echo "-> pnpm validate:docs"
-  pnpm validate:docs
+  echo "-> corepack pnpm lint:docs"
+  "${pnpm_cmd[@]}" lint:docs
+  echo "-> corepack pnpm validate:docs"
+  "${pnpm_cmd[@]}" validate:docs
 fi
 
 schema_like_files="$(printf '%s\n' "$changed_files" | grep -E '(^|/)(schema|api|dto)(/|$)' || true)"
@@ -56,8 +57,8 @@ if [ -n "$schema_like_files" ]; then
         [ -f "$package_dir/package.json" ] || continue
 
         package_name="$(node -e "process.stdout.write(require('./${package_dir}/package.json').name)")"
-        echo "-> pnpm --filter $package_name typecheck"
-        pnpm --filter "$package_name" typecheck
+        echo "-> corepack pnpm --filter $package_name typecheck"
+        "${pnpm_cmd[@]}" --filter "$package_name" typecheck
       done
 
   echo "OpenAPI/type generation validation is still deferred. See docs/progress/debt-ledger.md." >&2

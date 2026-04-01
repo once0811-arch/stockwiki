@@ -5,6 +5,7 @@ export interface StockKey {
 
 export type PageKey = string;
 export type RevisionId = string;
+export type SourceTier = "tier1" | "tier2" | "tier3" | "tier4";
 export type UserRole =
   | "reader"
   | "member"
@@ -16,6 +17,104 @@ export type UserRole =
 
 export type RevisionStatus = "approved" | "pending" | "rejected" | "reverted";
 export type PageProtectionLevel = "open" | "semi_protected" | "reviewer_only" | "locked";
+export type ReportReason = "no_citation";
+export type SourcePolicySeverity = "info" | "warning" | "high";
+export type SourcePolicyStatus = "clear" | "warning" | "flagged";
+export type SourcePolicyFindingCode = "missing_required_citation" | "outdated_source" | "low_tier_source";
+export type QueuePriority = "normal" | "high";
+
+export interface SourceTierDefinition {
+  articleUsage: string;
+  description: string;
+  label: string;
+  tier: SourceTier;
+}
+
+export interface CitationSectionPolicy {
+  citationRequired: boolean;
+  contentious: boolean;
+  description: string;
+  id: string;
+  label: string;
+  minTier: SourceTier;
+  requiresRecentSource: boolean;
+}
+
+export interface CitationRecord {
+  id: string;
+  label: string;
+  publishedAt?: string;
+  sectionId: string;
+  sourceTier: SourceTier;
+  sourceUrl: string;
+}
+
+export interface SourcePolicyFinding {
+  citationId?: string;
+  code: SourcePolicyFindingCode;
+  message: string;
+  reportReason?: ReportReason;
+  sectionId?: string;
+  severity: SourcePolicySeverity;
+}
+
+export interface SourcePolicyResult {
+  citationCount: number;
+  findings: SourcePolicyFinding[];
+  flaggedForModeration: boolean;
+  missingRequiredCitation: boolean;
+  outdatedCitationCount: number;
+  reportReasons: ReportReason[];
+  status: SourcePolicyStatus;
+}
+
+export interface RevisionSources {
+  changedSectionIds: string[];
+  citations: CitationRecord[];
+  policy: SourcePolicyResult;
+  queuePriority: QueuePriority;
+}
+
+export interface DeadLinkScanItem {
+  checkedAt: string;
+  citationId: string;
+  httpStatus?: number;
+  sourceUrl: string;
+  status: "dead" | "reachable" | "skipped";
+}
+
+export interface DeadLinkScanResult {
+  checkedCount: number;
+  deadCount: number;
+  items: DeadLinkScanItem[];
+}
+
+export const sourceTierDefinitions: SourceTierDefinition[] = [
+  {
+    tier: "tier1",
+    label: "Tier 1",
+    description: "Primary official disclosures such as exchange filings, regulator filings, and company IR materials.",
+    articleUsage: "Preferred for numbers, disclosures, and recent events."
+  },
+  {
+    tier: "tier2",
+    label: "Tier 2",
+    description: "Major reliable media, official interviews, and earnings call transcripts.",
+    articleUsage: "Acceptable supporting context when a primary source is not available."
+  },
+  {
+    tier: "tier3",
+    label: "Tier 3",
+    description: "Market data vendors and licensed industry research that still needs reviewer judgment.",
+    articleUsage: "Use sparingly and prefer a stronger source when possible."
+  },
+  {
+    tier: "tier4",
+    label: "Tier 4",
+    description: "Community posts, blogs, and social media.",
+    articleUsage: "Restricted for article body claims and should trigger reviewer scrutiny."
+  }
+];
 
 export interface PageRevision {
   id: RevisionId;

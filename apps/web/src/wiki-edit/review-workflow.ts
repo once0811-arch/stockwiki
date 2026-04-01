@@ -8,6 +8,7 @@ import {
   listReviewQueueItems,
   reviewStoredEditProposal
 } from "./pending-edit-store";
+import { getChangedSectionLabels } from "./source-policy";
 
 const marketDataProvider = new FixtureMarketDataProvider();
 
@@ -19,10 +20,16 @@ export interface ReviewQueueAccess {
 export interface ReviewQueueItem {
   authorId: string;
   canonicalPath: string;
+  changedSections: string[];
+  citationCount: number;
   comparePath?: string;
   createdAt: string;
   market: string;
   pageKey: string;
+  policyFindings: string[];
+  policyStatus: "clear" | "flagged" | "warning";
+  queuePriority: "high" | "normal";
+  reportReasons: string[];
   revisionId: string;
   summary: string;
   ticker: string;
@@ -36,6 +43,7 @@ export async function getModQueuePageData(input: { actor?: string }) {
   if (!session || access.mode !== "can_review") {
     return {
       access,
+      flaggedItemCount: 0,
       pendingItems: [],
       recentEvents: listReputationEvents(),
       session
@@ -62,10 +70,16 @@ export async function getModQueuePageData(input: { actor?: string }) {
       return {
         authorId: proposal.authorId,
         canonicalPath,
+        changedSections: getChangedSectionLabels(snapshot.citationSections, proposal.changedSectionIds),
+        citationCount: proposal.citations.length,
         comparePath,
         createdAt: proposal.createdAt,
         market: proposal.market,
         pageKey: proposal.pageKey,
+        policyFindings: proposal.policy.findings.map((finding) => finding.message),
+        policyStatus: proposal.policy.status,
+        queuePriority: proposal.queuePriority,
+        reportReasons: [...proposal.reportReasons],
         revisionId: proposal.revisionId,
         summary: proposal.summary,
         ticker: proposal.ticker,
@@ -76,6 +90,7 @@ export async function getModQueuePageData(input: { actor?: string }) {
 
   return {
     access,
+    flaggedItemCount: pendingItems.filter((item) => item.policyStatus === "flagged").length,
     pendingItems,
     recentEvents: listReputationEvents(),
     session

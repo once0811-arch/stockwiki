@@ -1,4 +1,5 @@
 import type {
+  CitationRecord,
   CompanyProfile,
   CorporateAction,
   Filing,
@@ -6,6 +7,17 @@ import type {
   Quote,
   StockKey
 } from "@stockwiki/domain";
+
+export interface ModerationFixtureCase {
+  changedSectionIds: string[];
+  citations: CitationRecord[];
+  contentMarkdown: string;
+  expectedFindingCodes: Array<"low_tier_source" | "missing_required_citation" | "outdated_source">;
+  expectedReportReasons: Array<"no_citation">;
+  expectedStatus: "clear" | "flagged" | "warning";
+  id: string;
+  summary: string;
+}
 
 const SAMSUNG_ELECTRONICS = "KRX:005930";
 const SK_HYNIX = "KRX:000660";
@@ -161,3 +173,56 @@ export const phase0Fixtures = {
   filings,
   corporateActions
 };
+
+export type FixtureCitationRecord = CitationRecord;
+
+export const moderationFixtureCases: ModerationFixtureCase[] = [
+  {
+    id: "factual-tier1-edit",
+    summary: "Adds a factual earnings note backed by a primary filing.",
+    contentMarkdown: "Samsung Electronics updated its Q4 2025 earnings guidance in the latest filing.",
+    changedSectionIds: ["financial-performance"],
+    citations: [
+      {
+        id: "citation-fixture-tier1",
+        label: "Samsung Electronics Q4 2025 earnings release",
+        publishedAt: "2026-01-31",
+        sectionId: "financial-performance",
+        sourceTier: "tier1",
+        sourceUrl: "https://example.test/filings/samsung-q4-2025"
+      }
+    ],
+    expectedFindingCodes: [],
+    expectedReportReasons: [],
+    expectedStatus: "clear"
+  },
+  {
+    id: "citation-missing-contentious-edit",
+    summary: "Adds a recent contentious claim without any citation.",
+    contentMarkdown: "Recent leadership controversy has materially changed the company outlook.",
+    changedSectionIds: ["governance-risk"],
+    citations: [],
+    expectedFindingCodes: ["missing_required_citation"],
+    expectedReportReasons: ["no_citation"],
+    expectedStatus: "flagged"
+  },
+  {
+    id: "outdated-tier2-source",
+    summary: "Adds a recent-events update backed only by an old media source.",
+    contentMarkdown: "The company continues to execute the same restructuring plan announced several years ago.",
+    changedSectionIds: ["recent-events"],
+    citations: [
+      {
+        id: "citation-fixture-tier2-old",
+        label: "Legacy restructuring coverage",
+        publishedAt: "2023-01-05",
+        sectionId: "recent-events",
+        sourceTier: "tier2",
+        sourceUrl: "https://example.test/news/legacy-restructuring"
+      }
+    ],
+    expectedFindingCodes: ["outdated_source", "low_tier_source"],
+    expectedReportReasons: [],
+    expectedStatus: "warning"
+  }
+];
