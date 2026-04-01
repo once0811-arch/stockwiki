@@ -26,7 +26,7 @@ export function StockPageView(props: { data: StockPageData }) {
         gap: "1.5rem"
       }}
     >
-      <PhaseBadge>Phase 4 Citation Policy Slice</PhaseBadge>
+      <PhaseBadge>Phase 5 Discussion Slice</PhaseBadge>
 
       <header
         style={{
@@ -148,15 +148,26 @@ export function StockPageView(props: { data: StockPageData }) {
       >
         <article style={cardStyle}>
           <h2 style={headingStyle}>Discussion Preview</h2>
+          <p style={{ margin: 0, color: "#475569" }}>
+            {data.discussionSummary.openThreadCount} open / {data.discussionSummary.reportedCommentCount} reported comment
+            {data.discussionSummary.reportedCommentCount === 1 ? "" : "s"} / {data.discussionSummary.threadCount} total thread
+            {data.discussionSummary.threadCount === 1 ? "" : "s"}
+          </p>
           <ul style={{ margin: 0, paddingLeft: "1.1rem", display: "grid", gap: "0.85rem" }}>
             {data.discussionPreview.map((item) => (
               <li key={item.id}>
                 <strong>{item.title}</strong>
                 <div>{item.summary}</div>
-                <div>{item.replies} replies</div>
+                <div>
+                  {item.sectionAnchor ? `${formatSectionLabel(data, item.sectionAnchor)} / ` : ""}
+                  {item.status} / {item.replies} repl{item.replies === 1 ? "y" : "ies"}
+                </div>
               </li>
             ))}
           </ul>
+          <Link href={data.discussionPath} style={linkStyle}>
+            Open Discussion
+          </Link>
         </article>
 
         <article style={cardStyle}>

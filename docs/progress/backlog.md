@@ -2,12 +2,18 @@
 
 상세 debt ledger: `docs/progress/debt-ledger.md`
 
-## Phase 5 Backlog
+## Phase 6 Backlog
 
-1. stock page 에 thread list/create discussion shell 추가
-2. comment/reply fake-first flow 와 helpful vote read model 추가
-3. report comment, pin/lock, section-anchor linking shell 추가
-4. article page discussion summary 를 실제 discussion read model 에 연결
+1. exact ticker / canonical title / alias match 를 지원하는 fake-first search index contract 와 fixture set 추가
+2. `/search` page 와 `GET /api/public/search?q=` shell 을 구현하고 reviewed-content-first ranking 을 고정
+3. autocomplete 와 alias support 를 포함한 기본 result grouping 을 추가
+4. approved review, alias update, discussion created 이벤트를 받는 indexing pipeline skeleton 과 lag metric surface 를 추가
+
+## Deferred From Phase 5
+
+1. in-memory discussion thread/comment/report store 를 persistent app DB adapter 로 교체
+2. discussion report handling, pin/lock actions, audit trail 을 dedicated admin/mod queue boundary 로 분리
+3. fake session based discussion participation 을 real auth/session boundary 로 치환
 
 ## Deferred From Phase 4
 
@@ -26,10 +32,6 @@
 1. public read API endpoints (`/api/public/stocks/:market/:ticker/history`, `/diff`) 를 별도 slice 로 정리
 2. in-memory shadow store 를 persistent app DB adapter 로 교체
 3. MediaWikiEngine contract tests 와 real API fixture harness 추가
-
-## Deferred From Phase 1
-
-1. discussion preview read model 을 실제 토론 도메인 shape 에 더 가깝게 정리
 
 ## Deferred From Phase 0
 

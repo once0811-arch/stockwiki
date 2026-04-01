@@ -9,7 +9,12 @@ import type {
 } from "@stockwiki/domain";
 import { sourceTierDefinitions } from "@stockwiki/domain";
 import { FixtureMarketDataProvider } from "@stockwiki/fixtures";
-import type { DiscussionPreviewItem, StockPageState } from "./stock-page-seeds";
+import {
+  getStockDiscussionPreviewData,
+  type DiscussionSummarySnapshot
+} from "../discussion/discussion-read-model";
+import type { DiscussionPreviewItem } from "../discussion/types";
+import type { StockPageState } from "./stock-page-seeds";
 import {
   getStockWikiSnapshot,
   type RevisionSourcesSnapshot,
@@ -21,7 +26,9 @@ export interface StockPageData {
   canonicalPath: string;
   citationSections: CitationSectionPolicy[];
   corporateActions: CorporateAction[];
+  discussionPath: string;
   discussionPreview: DiscussionPreviewItem[];
+  discussionSummary: DiscussionSummarySnapshot;
   editPath: string;
   filings: Filing[];
   indexable: boolean;
@@ -49,13 +56,16 @@ export async function getStockPageData(input: StockKey, actor?: string): Promise
     key,
     profile
   });
+  const discussionData = await getStockDiscussionPreviewData(key, actor);
 
   return {
     approvedSources: snapshot.approvedSources,
     canonicalPath: `/stocks/${key.market.toLowerCase()}/${key.ticker}`,
     citationSections: snapshot.citationSections,
     corporateActions,
-    discussionPreview: snapshot.seed.discussionPreview,
+    discussionPath: discussionData.discussionPath,
+    discussionPreview: discussionData.previewItems,
+    discussionSummary: discussionData.summary,
     editPath: buildEditPath(key, actor),
     filings,
     indexable: snapshot.seed.indexable && snapshot.wiki.reviewed,

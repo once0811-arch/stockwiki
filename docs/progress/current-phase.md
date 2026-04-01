@@ -1,40 +1,35 @@
 # Current Phase
 
-- current phase: Phase 5 - discussion system
+- current phase: Phase 6 - search
 - completed:
   - Phase 0 repository bootstrap closed with passing workspace checks
   - Phase 1 read-only stock page MVP closed
   - Phase 2 wiki bridge and revision model closed
   - Phase 3 edit proposal flow closed
   - Phase 4 citation and trust policy closed
-  - `/stocks/[market]/[ticker]/edit` now shows citation-required sections, source tier guidance, and a fake-first citation helper UI
-  - pending edit drafts now store revision source metadata, report reasons, queue priority, and source policy findings
-  - source policy evaluation now checks missing required citations, low-tier sources, and outdated sources before reviewer approval
-  - `/review/mod-queue` now prioritizes flagged edits and exposes `no_citation` reasons plus source policy findings
-  - public stock pages now render trust/source guidance and approved revision reference lists
-  - history and diff routes now expose citation counts and source policy states for each revision
-  - worker layer now includes a dead-link scan skeleton for citation URLs
-  - `packages/fixtures` now carries moderation fixture cases for citation and source-quality policy tests
+  - Phase 5 discussion system closed
+  - `/stocks/[market]/[ticker]/discussion` now renders fixture-backed thread list, thread creation, comment/reply flows, helpful votes, comment reports, and reviewer pin/lock actions
+  - discussion threads stay separated from approved wiki content while linking back to citation-aware article sections
+  - stock pages now read discussion summary data from the live discussion read model instead of placeholder preview seeds
+  - stock page discussion links preserve fake session context so member and reviewer navigation stays on the same flow
+  - discussion moderation summary exposes reported comments, locked threads, and resolved thread counts without changing approved article render rules
+  - discussion actions now reject thread/comment ids that do not belong to the current stock page
 - in progress:
-  - scoping the first Phase 5 discussion thread slice
+  - scoping the first Phase 6 search indexing slice
 - blockers:
   - none
 - next slice:
-  - add discussion thread list/create shell to the stock page summary area
-  - add comment/reply fake-first read/write path and moderation hooks for discussion content
+  - add a fake-first search index read model for exact ticker, canonical title, and alias matching
+  - implement `/search` and `GET /api/public/search?q=` shells with reviewed-content-first ranking
+  - add indexing pipeline skeleton and lag metric surface for approved wiki, alias, and discussion events
 - verification snapshot:
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" node -v` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm -v` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm install` passed
+  - `docker compose -f infra/compose/docker-compose.yml config` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web typecheck` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/stock-page.test.tsx tests/discussion-flow.test.ts` passed
+  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test:e2e` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm check` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" pnpm build` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web typecheck` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers typecheck` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/wiki-bridge test` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test -- tests/source-policy.test.ts tests/stock-page.test.tsx tests/edit-flow.test.ts` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/workers test` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web build` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web exec playwright install chromium` passed
-  - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" corepack pnpm --filter @stockwiki/web test:e2e` passed
   - `PATH="$HOME/.local/node-v24.13.1/bin:$PATH" ./scripts/hooks/post-edit-check.sh` passed
   - `./scripts/hooks/guard-secrets.sh` passed

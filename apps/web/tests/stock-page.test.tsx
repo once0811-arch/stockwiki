@@ -1,8 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { resetDiscussionStore } from "../src/discussion/discussion-store";
 import { buildStockMetadata } from "../src/stock-page/build-stock-metadata";
 import { getStockPageData } from "../src/stock-page/get-stock-page-data";
 
 describe("stock page read model", () => {
+  beforeEach(() => {
+    resetDiscussionStore();
+  });
+
   it("loads fixture-backed stock page data with approved wiki content", async () => {
     const data = await getStockPageData({
       market: "krx",
@@ -19,15 +24,29 @@ describe("stock page read model", () => {
     expect(data.citationSections).toHaveLength(4);
   });
 
-  it("returns placeholder content for search and discussions", async () => {
+  it("returns real discussion summary data for the stock page", async () => {
     const data = await getStockPageData({
       market: "krx",
       ticker: "005930"
     });
 
     expect(data.searchPlaceholder).toContain("Search placeholder");
+    expect(data.discussionPath).toBe("/stocks/krx/005930/discussion");
+    expect(data.discussionSummary.threadCount).toBeGreaterThan(0);
     expect(data.discussionPreview).toHaveLength(2);
-    expect(data.discussionPreview[0]?.title).toContain("placeholder");
+    expect(data.discussionPreview[0]?.title).toContain("실적");
+  });
+
+  it("preserves actor context in the discussion link", async () => {
+    const data = await getStockPageData(
+      {
+        market: "krx",
+        ticker: "005930"
+      },
+      "member-1"
+    );
+
+    expect(data.discussionPath).toBe("/stocks/krx/005930/discussion?actor=member-1");
   });
 
   it("generates canonical metadata for the stock route", async () => {

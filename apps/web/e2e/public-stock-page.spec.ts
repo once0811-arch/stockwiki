@@ -3,14 +3,60 @@ import { expect, test } from "@playwright/test";
 test("renders the public stock page read model", async ({ page }) => {
   await page.goto("/stocks/krx/005930");
 
-  await expect(page.getByText("Phase 4 Citation Policy Slice")).toBeVisible();
+  await expect(page.getByText("Phase 5 Discussion Slice")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Samsung Electronics" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "System Data" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Approved Wiki" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Discussion Preview" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Trust & Sources" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "References" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open Discussion" })).toBeVisible();
   await expect(page.getByPlaceholder("Search placeholder for aliases, filings, and related pages")).toBeVisible();
+});
+
+test("renders the stock discussion page and lets a member create a thread", async ({ page }) => {
+  await page.goto("/stocks/krx/005930/discussion?actor=member-1");
+
+  await expect(page.getByRole("heading", { name: "Discussion" })).toBeVisible();
+  await expect(page.getByText("Total Threads")).toBeVisible();
+  await page.getByLabel("Thread Title").fill("phase 5 playwright thread");
+  await page.getByLabel("Linked Section").selectOption("financial-performance");
+  await page.getByLabel("Opening Comment").fill("Playwright에서 생성한 새 discussion thread입니다.");
+  await page.getByRole("button", { name: "Create Thread" }).click();
+
+  await expect(page.getByText("Discussion thread created.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "phase 5 playwright thread" })).toBeVisible();
+
+  await page.getByRole("link", { name: "Back To Stock Page" }).click();
+  await expect(page.getByText("phase 5 playwright thread")).toBeVisible();
+});
+
+test("keeps actor context when navigating from the stock page to discussion", async ({ page }) => {
+  await page.goto("/stocks/krx/005930?actor=member-1");
+
+  const discussionLink = page.getByRole("link", { name: "Open Discussion" });
+  await expect(discussionLink).toHaveAttribute("href", "/stocks/krx/005930/discussion?actor=member-1");
+  await discussionLink.click();
+
+  await expect(page.getByText("Signed in as Member Demo (member)")).toBeVisible();
+});
+
+test("lets a reviewer moderate reported discussion content", async ({ page }) => {
+  await page.goto("/stocks/krx/035420/discussion?actor=member-1");
+
+  await page.getByLabel("Report Reason comment-seed-naver-ads-1").selectOption("spam");
+  await page.getByRole("button", { name: "Report Comment" }).first().click();
+  await expect(page.getByText("Comment report submitted.")).toBeVisible();
+
+  await page.goto("/stocks/krx/035420/discussion?actor=reviewer-1");
+  const reportedSummaryCard = page.locator("article").filter({ hasText: "Reported Comments" }).first();
+  await expect(reportedSummaryCard).toBeVisible();
+  await expect(reportedSummaryCard.getByText("2", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Pin Thread" }).click();
+  await expect(page.getByText("Thread pin state updated.")).toBeVisible();
+  await page.getByRole("button", { name: "Lock Thread" }).click();
+  await expect(page.getByText("Thread lock state updated.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Unlock Thread" })).toBeVisible();
 });
 
 test("renders a second fixture-backed stock page", async ({ page }) => {

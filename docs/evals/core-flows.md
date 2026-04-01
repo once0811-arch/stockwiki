@@ -50,6 +50,15 @@ Phase 별로 반드시 검증해야 할 핵심 사용자 흐름을 정리한다.
 - history/diff pages expose citation counts and source policy states per revision
 - worker dead-link scan skeleton classifies citation URLs as reachable, dead, or skipped
 
+## Phase 5
+
+- `/stocks/[market]/[ticker]/discussion` renders fixture-backed summary cards, thread list, and create-thread UI
+- member and reviewer sessions can create threads, add comments/replies, and keep the stock-page discussion summary in sync
+- helpful votes and comment reports update the discussion read model without changing the approved article render
+- reviewer pin/lock controls affect discussion moderation surfaces and locked threads block member replies
+- stock pages show a live discussion summary sourced from the discussion read model and preserve actor context when linking into discussion
+- discussion write/moderation actions reject thread/comment ids that belong to a different stock page
+
 ## Contract Eval Targets
 
 ### WikiEngine
